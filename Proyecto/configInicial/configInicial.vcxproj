@@ -141,6 +141,7 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="carro.h" />
+    <ClInclude Include="Mesa.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="silla.h" />
     <ClInclude Include="tren.h" />
@@ -156,6 +157,7 @@
   <ItemGroup>
     <ClCompile Include="carro.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Mesa.cpp" />
     <ClCompile Include="silla.cpp" />
     <ClCompile Include="tren.cpp" />
   </ItemGroup>

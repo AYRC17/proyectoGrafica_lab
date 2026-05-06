@@ -26,6 +26,7 @@
 #include "Carro.h"
 #include "Tren.h"
 #include "Silla.h"
+#include "Mesa.h"
 // Function prototypes
 void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode);
 void MouseCallback(GLFWwindow *window, double xPos, double yPos);
@@ -116,6 +117,9 @@ bool AnimTren = false;
 Silla SillaPlegable(glm::vec3(-2.0f, 0.0f, -2.0f));
 bool PlegarSilla = false;
 bool DesplegarSilla = false;
+Mesa MesaPlegable(glm::vec3(5.0f, 0.0f, -3.0f));
+bool AbrirMesa = false;
+bool CerrarMesa = false;
 // Deltatime
 GLfloat deltaTime = 0.0f;	// Time between current frame and last frame
 GLfloat lastFrame = 0.0f;  	// Time of last frame
@@ -166,6 +170,7 @@ int main()
 	CarroAzul.Inicializar();
 	TrenRojo.Inicializar();
 	SillaPlegable.Inicializar();
+	MesaPlegable.Inicializar();
 
 	// Define the viewport dimensions
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -312,7 +317,7 @@ int main()
 		//dibujar tren
 		TrenRojo.Draw(lightingShader, VAO);
 		SillaPlegable.Draw(lightingShader, VAO);
-		
+		MesaPlegable.Draw(lightingShader, VAO);
 
 
 		// Also draw the lamp object, again binding the appropriate shader
@@ -387,6 +392,7 @@ void DoMovement()
 
 
 	}
+
 	
 }
 
@@ -446,6 +452,18 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode
 	else {
 		DesplegarSilla = false;
 	}
+	if (keys[GLFW_KEY_L]) {
+		AbrirMesa = true;
+	}
+	else {
+		AbrirMesa = false;
+	}
+	if (keys[GLFW_KEY_K]) {
+		CerrarMesa = true;
+	}
+	else {
+		CerrarMesa = false;
+	}
 }
 void Animation() {
 	
@@ -461,6 +479,13 @@ void Animation() {
 	}
 	if (DesplegarSilla && SillaPlegable.anguloPlegado > 0.0f) {
 		SillaPlegable.anguloPlegado -= 50.0f * deltaTime; // La silla se abre
+	}
+
+	if (AbrirMesa && MesaPlegable.anguloApertura < 180.0f) {
+		MesaPlegable.anguloApertura += 60.0f * deltaTime;
+	}
+	if (CerrarMesa && MesaPlegable.anguloApertura > 90.0f) {
+		MesaPlegable.anguloApertura -= 60.0f * deltaTime;
 	}
 }
 
