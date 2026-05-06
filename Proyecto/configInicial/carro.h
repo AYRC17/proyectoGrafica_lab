@@ -13,7 +13,9 @@ public:
     float avance;
 
     GLuint texturaChasis;
+    GLuint texturaCabina;
     GLuint texturaLlanta;
+    GLuint texturaLlantaLateral;
 
     Carro(glm::vec3 posInicial);
 
