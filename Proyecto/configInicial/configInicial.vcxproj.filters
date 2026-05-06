@@ -30,6 +30,9 @@
     <ClInclude Include="tren.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
+    <ClInclude Include="silla.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\lamp.frag">
@@ -59,6 +62,9 @@
       <Filter>Archivos de origen</Filter>
     </ClCompile>
     <ClCompile Include="tren.cpp">
+      <Filter>Archivos de encabezado</Filter>
+    </ClCompile>
+    <ClCompile Include="silla.cpp">
       <Filter>Archivos de encabezado</Filter>
     </ClCompile>
   </ItemGroup>

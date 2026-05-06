@@ -25,6 +25,7 @@
 #include "Model.h"
 #include "Carro.h"
 #include "Tren.h"
+#include "Silla.h"
 // Function prototypes
 void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode);
 void MouseCallback(GLFWwindow *window, double xPos, double yPos);
@@ -112,7 +113,9 @@ Carro CarroAzul(glm::vec3(0.0f, 0.0f, 0.0f));
 bool AnimCarro = false;
 Tren TrenRojo(glm::vec3(3.0f, 0.0f, 3.0f));
 bool AnimTren = false;
-
+Silla SillaPlegable(glm::vec3(-2.0f, 0.0f, -2.0f));
+bool PlegarSilla = false;
+bool DesplegarSilla = false;
 // Deltatime
 GLfloat deltaTime = 0.0f;	// Time between current frame and last frame
 GLfloat lastFrame = 0.0f;  	// Time of last frame
@@ -159,9 +162,11 @@ int main()
 		std::cout << "Failed to initialize GLEW" << std::endl;
 		return EXIT_FAILURE;
 	}
-	
+	//inicializamos objetos
 	CarroAzul.Inicializar();
 	TrenRojo.Inicializar();
+	SillaPlegable.Inicializar();
+
 	// Define the viewport dimensions
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
@@ -306,7 +311,7 @@ int main()
 		CarroAzul.Draw(lightingShader, VAO);
 		//dibujar tren
 		TrenRojo.Draw(lightingShader, VAO);
-
+		SillaPlegable.Draw(lightingShader, VAO);
 		
 
 
@@ -427,6 +432,20 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode
 	{
 		AnimCarro = !AnimCarro;
 	}
+
+	if (keys[GLFW_KEY_O]) {
+		PlegarSilla = true;
+	}
+	else {
+		PlegarSilla = false;
+	}
+	// Mantener presionada la 'P' para desplegar
+	if (keys[GLFW_KEY_P]) {
+		DesplegarSilla = true;
+	}
+	else {
+		DesplegarSilla = false;
+	}
 }
 void Animation() {
 	
@@ -436,6 +455,12 @@ void Animation() {
 		CarroAzul.rotacionLlantas -= 100.0f * deltaTime;
 		// El carro avanza sobre el eje X
 		CarroAzul.avance += 2.0f * deltaTime;
+	}
+	if (PlegarSilla && SillaPlegable.anguloPlegado < 80.0f) {
+		SillaPlegable.anguloPlegado += 50.0f * deltaTime; // La silla se cierra
+	}
+	if (DesplegarSilla && SillaPlegable.anguloPlegado > 0.0f) {
+		SillaPlegable.anguloPlegado -= 50.0f * deltaTime; // La silla se abre
 	}
 }
 
