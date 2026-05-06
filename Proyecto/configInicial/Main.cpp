@@ -24,6 +24,7 @@
 #include "Camera.h"
 #include "Model.h"
 #include "Carro.h"
+#include "Tren.h"
 // Function prototypes
 void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode);
 void MouseCallback(GLFWwindow *window, double xPos, double yPos);
@@ -52,9 +53,7 @@ glm::vec3 pointLightPositions[] = {
 	glm::vec3(0.0f,0.0f, 0.0f)
 };
 
-//declaracion de objetos
-Carro miCarroProcedural(glm::vec3(0.0f, 0.0f, 0.0f));
-bool AnimCarro = false;
+
 
 float vertices[] = {
     // Posiciones          // Normales           // UVs
@@ -106,9 +105,13 @@ float vertices[] = {
 
 glm::vec3 Light1 = glm::vec3(0);
 //Anim
-float rotBall = 0;
 bool AnimBall = false;
 
+//declaracion de objetos
+Carro CarroAzul(glm::vec3(0.0f, 0.0f, 0.0f));
+bool AnimCarro = false;
+Tren TrenRojo(glm::vec3(3.0f, 0.0f, 3.0f));
+bool AnimTren = false;
 
 // Deltatime
 GLfloat deltaTime = 0.0f;	// Time between current frame and last frame
@@ -156,8 +159,9 @@ int main()
 		std::cout << "Failed to initialize GLEW" << std::endl;
 		return EXIT_FAILURE;
 	}
-	// Inicializamos la textura de OpenGL después de GLEW
-	miCarroProcedural.Inicializar();
+	
+	CarroAzul.Inicializar();
+	TrenRojo.Inicializar();
 	// Define the viewport dimensions
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
@@ -167,9 +171,8 @@ int main()
 	Shader lampShader("Shader/lamp.vs", "Shader/lamp.frag");
 	
 	//models
-	Model Dog((char*)"Models/SotanoA.obj");
+	Model Sotano((char*)"Models/SotanoA.obj");
 	Model Piso((char*)"Models/piso.obj");
-	Model Ball((char*)"Models/Trump-4.obj");
 	
 	// First, set the container's VAO (and VBO)
 	GLuint VBO, VAO;
@@ -293,24 +296,18 @@ int main()
 	/*	model = glm::mat4(1);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-		Dog.Draw(lightingShader);*/
+		Sotano.Draw(lightingShader);*/
 
-		//model = glm::mat4(1);
-		//glEnable(GL_BLEND);//Avtiva la funcionalidad para trabajar el canal alfa
-		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 1);
-		//model = glm::rotate(model, glm::radians(rotBall), glm::vec3(0.0f, 1.0f, 0.0f));
-		//model = glm::translate(model, glm::vec3(0.0f, 0.0f, 3.0f));
-		//model = glm::scale(model, glm::vec3(0.09f));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-	 //   Ball.Draw(lightingShader); 
-		//glDisable(GL_BLEND);  //Desactiva el canal alfa 
-		//glBindVertexArray(0);
 
 		lightingShader.Use();
+
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-		miCarroProcedural.Draw(lightingShader, VAO);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		CarroAzul.Draw(lightingShader, VAO);
+		//dibujar tren
+		TrenRojo.Draw(lightingShader, VAO);
+
+		
 
 
 		// Also draw the lamp object, again binding the appropriate shader
@@ -385,33 +382,6 @@ void DoMovement()
 
 
 	}
-
-	if (keys[GLFW_KEY_T])
-	{
-		pointLightPositions[0].x += 0.01f;
-	}
-	if (keys[GLFW_KEY_G])
-	{
-		pointLightPositions[0].x -= 0.01f;
-	}
-
-	if (keys[GLFW_KEY_Y])
-	{
-		pointLightPositions[0].y += 0.01f;
-	}
-
-	if (keys[GLFW_KEY_H])
-	{
-		pointLightPositions[0].y -= 0.01f;
-	}
-	if (keys[GLFW_KEY_U])
-	{
-		pointLightPositions[0].z -= 0.1f;
-	}
-	if (keys[GLFW_KEY_J])
-	{
-		pointLightPositions[0].z += 0.01f;
-	}
 	
 }
 
@@ -459,21 +429,13 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode
 	}
 }
 void Animation() {
-	if (AnimBall)
-	{
-		rotBall += 0.2f;
-		//printf("%f", rotBall);
-	}
-	else
-	{
-		//rotBall = 0.0f;
-	}
+	
 	if (AnimCarro)
 	{
 		// Las llantas rotan sobre su propio eje
-		miCarroProcedural.rotacionLlantas -= 100.0f * deltaTime;
+		CarroAzul.rotacionLlantas -= 100.0f * deltaTime;
 		// El carro avanza sobre el eje X
-		miCarroProcedural.avance += 5.0f * deltaTime;
+		CarroAzul.avance += 2.0f * deltaTime;
 	}
 }
 
