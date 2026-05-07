@@ -16,6 +16,10 @@ public:
     GLuint texturaCabina;
     GLuint texturaLlanta;
     GLuint texturaLlantaLateral;
+    GLuint texturaFaroDelantero;
+    GLuint texturaFaroTrasero;
+    GLuint specMetal;
+    GLuint specGoma;
 
     Carro(glm::vec3 posInicial);
 

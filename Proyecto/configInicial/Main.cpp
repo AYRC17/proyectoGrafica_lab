@@ -30,7 +30,7 @@
 #include "Mesa.h"
 #include "pikachu.h"
 #include "stand.h"
-
+#include "persona.h"
 // Function prototypes
 void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode);
 void MouseCallback(GLFWwindow *window, double xPos, double yPos);
@@ -126,6 +126,8 @@ bool AbrirMesa = false;
 bool CerrarMesa = false;
 Pikachu botarga(glm::vec3(-5.0f, 0.0f, 5.0f));
 Stand stand1(glm::vec3(0.0f, 0.0f, -5.0f));
+Persona persona1(glm::vec3(2.0f, 0.0f, -4.0f));
+
 // Deltatime
 GLfloat deltaTime = 0.0f;	// Time between current frame and last frame
 GLfloat lastFrame = 0.0f;  	// Time of last frame
@@ -179,6 +181,7 @@ int main()
 	MesaPlegable.Inicializar();
 	botarga.Inicializar();
 	stand1.Inicializar();
+	persona1.Inicializar();
 	// Define the viewport dimensions
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
@@ -314,12 +317,8 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		Sotano.Draw(lightingShader);*/
-
-
-		lightingShader.Use();
-
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		
+		
 		CarroAzul.Draw(lightingShader, VAO);
 		//dibujar tren
 		TrenRojo.Draw(lightingShader, VAO);
@@ -327,6 +326,7 @@ int main()
 		MesaPlegable.Draw(lightingShader, VAO);
 		botarga.Draw(lightingShader, VAO);
 		stand1.Draw(lightingShader, VAO);
+		persona1.Draw(lightingShader, VAO);
 		// Also draw the lamp object, again binding the appropriate shader
 		lampShader.Use();
 
