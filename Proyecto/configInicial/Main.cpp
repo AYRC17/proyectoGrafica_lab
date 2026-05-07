@@ -23,10 +23,14 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "Model.h"
+//objetos creados
 #include "Carro.h"
 #include "Tren.h"
 #include "Silla.h"
 #include "Mesa.h"
+#include "pikachu.h"
+#include "stand.h"
+
 // Function prototypes
 void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode);
 void MouseCallback(GLFWwindow *window, double xPos, double yPos);
@@ -120,6 +124,8 @@ bool DesplegarSilla = false;
 Mesa MesaPlegable(glm::vec3(5.0f, 0.0f, -3.0f));
 bool AbrirMesa = false;
 bool CerrarMesa = false;
+Pikachu botarga(glm::vec3(-5.0f, 0.0f, 5.0f));
+Stand stand1(glm::vec3(0.0f, 0.0f, -5.0f));
 // Deltatime
 GLfloat deltaTime = 0.0f;	// Time between current frame and last frame
 GLfloat lastFrame = 0.0f;  	// Time of last frame
@@ -171,7 +177,8 @@ int main()
 	TrenRojo.Inicializar();
 	SillaPlegable.Inicializar();
 	MesaPlegable.Inicializar();
-
+	botarga.Inicializar();
+	stand1.Inicializar();
 	// Define the viewport dimensions
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
@@ -318,8 +325,8 @@ int main()
 		TrenRojo.Draw(lightingShader, VAO);
 		SillaPlegable.Draw(lightingShader, VAO);
 		MesaPlegable.Draw(lightingShader, VAO);
-
-
+		botarga.Draw(lightingShader, VAO);
+		stand1.Draw(lightingShader, VAO);
 		// Also draw the lamp object, again binding the appropriate shader
 		lampShader.Use();
 

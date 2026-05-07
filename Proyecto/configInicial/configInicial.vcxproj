@@ -142,8 +142,10 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="carro.h" />
     <ClInclude Include="Mesa.h" />
+    <ClInclude Include="pikachu.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="silla.h" />
+    <ClInclude Include="stand.h" />
     <ClInclude Include="tren.h" />
   </ItemGroup>
   <ItemGroup>
@@ -158,7 +160,9 @@
     <ClCompile Include="carro.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Mesa.cpp" />
+    <ClCompile Include="pikachu.cpp" />
     <ClCompile Include="silla.cpp" />
+    <ClCompile Include="stand.cpp" />
     <ClCompile Include="tren.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -12,7 +12,7 @@ void Mesa::Inicializar() {
     int width, height, nrChannels;
     unsigned char* data;
 
-    // --- 1. Textura del Tablón (Madera o Plástico) ---
+    // --- 1. Textura del Tablón 
     glGenTextures(1, &texturaTablon);
     glBindTexture(GL_TEXTURE_2D, texturaTablon);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -26,25 +26,19 @@ void Mesa::Inicializar() {
         glTexImage2D(GL_TEXTURE_2D, 0, formato, width, height, 0, formato, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
     }
-    else {
-        unsigned char colorBlanco[] = { 240, 240, 240 };
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, colorBlanco);
-    }
+    
     stbi_image_free(data);
 
     // --- 2. Textura de las Patas (Metal) ---
     glGenTextures(1, &texturaPatas);
     glBindTexture(GL_TEXTURE_2D, texturaPatas);
-    data = stbi_load("images/metal.jpg", &width, &height, &nrChannels, 0);
+    data = stbi_load("images/plataforma.jpg", &width, &height, &nrChannels, 0);
     if (data) {
         GLenum formato = (nrChannels == 4) ? GL_RGBA : GL_RGB;
         glTexImage2D(GL_TEXTURE_2D, 0, formato, width, height, 0, formato, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
     }
-    else {
-        unsigned char colorGris[] = { 100, 100, 100 };
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, colorGris);
-    }
+    
     stbi_image_free(data);
 
     glBindTexture(GL_TEXTURE_2D, 0);
