@@ -133,6 +133,16 @@ Stand stand1(glm::vec3(6.8f, 0.03f, -1.5f));
 Pikachu botarga(glm::vec3(19.0f, 0.050f, 2.7f));
 
 Persona persona1(glm::vec3(6.8f, 0.13f, -1.1f));
+Persona personaCaminando(glm::vec3(14.0f, 0.13f, 1.0f));
+bool animPersonaCaminando = false;
+int estadoCaminando = 0; // 0: Reposo, 1: Pierna Der. Adelante, 2: Pierna Izq. Adelante
+float velocidadCaminata = 80.0f; // Velocidad de rotación de las extremidades
+float limitePaso = 35.0f; // Ángulo máximo que pueden alcanzar las piernas
+int direccionRuta = 0;
+
+//Silla silla2(glm::vec3(0.0f, 0.050f, 0.3f));
+//Mesa mesa2(glm::vec3(0.0f, 0.74f, -0.5f));
+//Stand stand2(glm::vec3(0.0f, 0.03f, 0.0f));
 
 // Deltatime
 GLfloat deltaTime = 0.0f;	// Time between current frame and last frame
@@ -188,6 +198,10 @@ int main()
 	botarga.Inicializar();
 	stand1.Inicializar();
 	persona1.Inicializar();
+	personaCaminando.Inicializar();
+	/*silla2.Inicializar();
+	mesa2.Inicializar();
+	stand2.Inicializar();*/
 	// Define the viewport dimensions
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
@@ -343,9 +357,33 @@ int main()
 		persona1.escala = glm::vec3(0.42f, 0.42f, 0.42f);
 		persona1.Draw(lightingShader, VAO);
 
+		//float desplazamientoX = 5.0f; // Espacio entre cada set
+
+		//for (int i = 0; i < 4; i++) {
+		//	glm::mat4 matrizSet = glm::mat4(1.0f);
+
+		//	// Posicionamos cada set en el eje X
+		//	matrizSet = glm::translate(matrizSet, glm::vec3(i * desplazamientoX, 0.0f, -5.0f));
+
+		//	// Lógica para cambiar el tamaño
+		//	if (i >= 2) {
+		//		matrizSet = glm::scale(matrizSet, glm::vec3(0.6f, 0.7f, 0.6f));
+		//	}
+
+		//	// Dibujamos usando la matriz padre
+		//	stand2.Draw(lightingShader, VAO, matrizSet);
+		//	mesa2.Draw(lightingShader, VAO, matrizSet);
+		//	silla2.anguloPlegado = 180.0f;
+		//	silla2.Draw(lightingShader, VAO, matrizSet);
+		//}
+		personaCaminando.rotacion = glm::vec3(0.0f, 180.0f, 0.0f);
+		personaCaminando.escala = glm::vec3(0.42f, 0.42f, 0.42f);
+		personaCaminando.Draw(lightingShader, VAO);
+
 		// Also draw the lamp object, again binding the appropriate shader
 		lampShader.Use();
 
+		
 		// Get location objects for the matrices on the lamp shader (these could be different on a different shader)
 		modelLoc = glGetUniformLocation(lampShader.Program, "model");
 		viewLoc = glGetUniformLocation(lampShader.Program, "view");
@@ -476,6 +514,9 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode
 	{
 		AnimacionMesaEnProgreso = false;
 	}
+	if (key == GLFW_KEY_C && action == GLFW_PRESS) {
+		animPersonaCaminando = !animPersonaCaminando;
+	}
 }
 void Animation() {
 	
@@ -513,6 +554,87 @@ void Animation() {
 			(!SillaAbierta && SillaPlegable.anguloPlegado <= 0.0f)) {
 			AnimSilla = false;
 		}
+	}
+	//Caminata
+	if (animPersonaCaminando) {
+		// Si acaba de iniciar, pasamos del estado de reposo (0) al primer movimiento (1)
+		if (estadoCaminando == 0) {
+			estadoCaminando = 1;
+		}
+
+		// Pierna derecha adelante, pierna izquierda atrás
+		if (estadoCaminando == 1) {
+			personaCaminando.rotPiernaDerX += velocidadCaminata * deltaTime;
+			personaCaminando.rotPiernaIzqX -= velocidadCaminata * deltaTime;
+
+			// Los brazos hacen el movimiento contrario a las piernas
+			personaCaminando.rotHombroDerX -= velocidadCaminata * deltaTime;
+			personaCaminando.rotHombroIzqX += velocidadCaminata * deltaTime;
+
+			// Condición para cambiar de estado (Llegó al límite del paso)
+			if (personaCaminando.rotPiernaDerX >= limitePaso) {
+				estadoCaminando = 2; // Cambiamos al movimiento contrario
+			}
+		}
+		// Pierna izquierda adelante, pierna derecha atrás
+		else if (estadoCaminando == 2) {
+			personaCaminando.rotPiernaDerX -= velocidadCaminata * deltaTime;
+			personaCaminando.rotPiernaIzqX += velocidadCaminata * deltaTime;
+
+			// Los brazos hacen el movimiento contrario
+			personaCaminando.rotHombroDerX += velocidadCaminata * deltaTime;
+			personaCaminando.rotHombroIzqX -= velocidadCaminata * deltaTime;
+
+			// Condición para regresar al primer estado
+			if (personaCaminando.rotPiernaDerX <= -limitePaso) {
+				estadoCaminando = 1;
+			}
+		}
+
+		//DESPLAZAMIENTO
+		if (direccionRuta == 0) {
+			// Avanza hacia -Z
+			personaCaminando.posicion.z -= 1.5f * deltaTime;
+			personaCaminando.rotacion.y = 0.0f; // Orientación original
+
+			// Llegó a la coordenada límite en -Z?
+			if (personaCaminando.posicion.z <= -10.0f) { 
+				direccionRuta = 1; // Cambiamos el estado para que comience a regresar
+			}
+		}
+		else if (direccionRuta == 1) {
+			// Regresa hacia +Z
+			personaCaminando.posicion.z += 1.5f * deltaTime;
+
+			// Le damos la media vuelta al modelo para que no camine de espaldas
+			personaCaminando.rotacion.y = -180.0f;
+
+			// Regresó a su punto de origen?
+			if (personaCaminando.posicion.z >= 0.0f) { // <-- LÍMITE DE ORIGEN
+				direccionRuta = 0; // Reiniciamos el ciclo para que vuelva a ir hacia -Z
+			}
+		}
+		//vercion 1 de caminata: personaCaminando.posicion.z -= 1.5f * deltaTime;
+		
+		// Flexionar ligeramente las rodillas/codos mientras camina 
+		personaCaminando.rotRodillaDer = 15.0f; // Pequeña flexión estática
+		personaCaminando.rotRodillaIzq = 15.0f;
+		personaCaminando.rotCodoDer = -15.0f;
+		personaCaminando.rotCodoIzq = -15.0f;
+
+	}
+	else {
+		// Cuando se desactiva la animación, mandamos un cero en cada una de sus componentes (reposo)
+		estadoCaminando = 0;
+		personaCaminando.rotPiernaDerX = 0.0f;
+		personaCaminando.rotPiernaIzqX = 0.0f;
+		personaCaminando.rotHombroDerX = 0.0f;
+		personaCaminando.rotHombroIzqX = 0.0f;
+
+		personaCaminando.rotRodillaDer = 0.0f;
+		personaCaminando.rotRodillaIzq = 0.0f;
+		personaCaminando.rotCodoDer = 0.0f;
+		personaCaminando.rotCodoIzq = 0.0f;
 	}
 }
 

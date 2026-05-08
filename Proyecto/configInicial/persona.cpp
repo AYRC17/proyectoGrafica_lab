@@ -6,11 +6,11 @@ Persona::Persona(glm::vec3 posInicial) {
 	rotacion = glm::vec3(0.0f, 0.0f, 0.0f);
     escala = glm::vec3(1.0f, 1.0f, 1.0f);
 
-    // Inicialización en Pose T (Brazos extendidos)
+    // Inicialización de pose
     rotCuelloX = 0.0f; rotCuelloY = 0.0f;
-    rotHombroIzqX = 0.0f; rotHombroIzqZ = 90.0f; // Brazo extendido
+    rotHombroIzqX = 0.0f; rotHombroIzqZ = -5.0f; // Brazo en descanso
     rotCodoIzq = 0.0f;
-    rotHombroDerX = 0.0f; rotHombroDerZ = -90.0f; // Brazo extendido
+    rotHombroDerX = 0.0f; rotHombroDerZ = 5.0f; // Brazo en descanso
     rotCodoDer = 0.0f;
     rotPiernaIzqX = 0.0f; rotRodillaIzq = 0.0f;
     rotPiernaDerX = 0.0f; rotRodillaDer = 0.0f;
@@ -70,7 +70,7 @@ void Persona::Draw(Shader& shader, GLuint VAO) {
     glm::mat4 mCuelloPivote = glm::translate(mTorsoBase, glm::vec3(0.0f, 0.5f, 0.0f));
     mCuelloPivote = glm::rotate(mCuelloPivote, glm::radians(rotCuelloY), glm::vec3(0.0f, 1.0f, 0.0f));
     mCuelloPivote = glm::rotate(mCuelloPivote, glm::radians(rotCuelloX), glm::vec3(1.0f, 0.0f, 0.0f));
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+    
     // Cabeza (Piel)
     glBindTexture(GL_TEXTURE_2D, texturaPiel);
     glm::mat4 mCabezaDraw = glm::translate(mCuelloPivote, glm::vec3(0.0f, 0.3f, 0.0f));
@@ -121,7 +121,7 @@ void Persona::Draw(Shader& shader, GLuint VAO) {
 
     // Cabello
     glBindTexture(GL_TEXTURE_2D, texturaCabello);
-    glm::mat4 mCabello = glm::translate(mCuelloPivote, glm::vec3(0.0f, 0.56f, -0.05f));
+    glm::mat4 mCabello = glm::translate(mCuelloPivote, glm::vec3(0.0f, 0.56f, -0.02f));
     mCabello = glm::scale(mCabello, glm::vec3(0.5f, 0.15f, 0.5f));
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(mCabello));
     glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -140,7 +140,7 @@ void Persona::Draw(Shader& shader, GLuint VAO) {
 
     // Antebrazo Izquierdo (Piel)
     glBindTexture(GL_TEXTURE_2D, texturaPiel);
-    glm::mat4 mCodoIzq = glm::translate(mHombroIzq, glm::vec3(0.0f, -0.9f, 0.0f));
+    glm::mat4 mCodoIzq = glm::translate(mHombroIzq, glm::vec3(0.0f, -0.4f, 0.0f));
     mCodoIzq = glm::rotate(mCodoIzq, glm::radians(rotCodoIzq), glm::vec3(1.0f, 0.0f, 0.0f)); // Dobla hacia adelante
 
     glm::mat4 mAntebrazoIzqDraw = glm::translate(mCodoIzq, glm::vec3(0.0f, -0.3f, 0.0f));
@@ -167,7 +167,7 @@ void Persona::Draw(Shader& shader, GLuint VAO) {
 
     // Antebrazo Derecho (Piel)
     glBindTexture(GL_TEXTURE_2D, texturaPiel);
-    glm::mat4 mCodoDer = glm::translate(mHombroDer, glm::vec3(0.0f, -0.9f, 0.0f));
+    glm::mat4 mCodoDer = glm::translate(mHombroDer, glm::vec3(0.0f, -0.4f, 0.0f));
     mCodoDer = glm::rotate(mCodoDer, glm::radians(rotCodoDer), glm::vec3(1.0f, 0.0f, 0.0f));
 
     glm::mat4 mAntebrazoDerDraw = glm::translate(mCodoDer, glm::vec3(0.0f, -0.3f, 0.0f));
