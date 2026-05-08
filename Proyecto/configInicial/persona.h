@@ -8,7 +8,8 @@
 class Persona {
 public:
     glm::vec3 posicion;
-
+    glm::vec3 escala;
+    glm::vec3 rotacion;
     // --- Ángulos de Articulación ---
     float rotCuelloX, rotCuelloY;
 

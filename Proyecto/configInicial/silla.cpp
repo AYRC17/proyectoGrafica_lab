@@ -4,6 +4,8 @@
 
 Silla::Silla(glm::vec3 posInicial) {
     posicion = posInicial;
+    escala = glm::vec3(1.0f, 1.0f, 1.0f);
+    rotacion = glm::vec3(0.0f, 0.0f, 0.0f);
     anguloPlegado = 80.0f;
 }
 
@@ -57,7 +59,10 @@ void Silla::Draw(Shader& shader, GLuint VAO) {
 
     glm::mat4 modelSilla = glm::mat4(1.0f);
     modelSilla = glm::translate(modelSilla, posicion);
-
+	modelSilla = glm::rotate(modelSilla, glm::radians(rotacion.x), glm::vec3(1.0f, 0.0f, 0.0f));
+	modelSilla = glm::rotate(modelSilla, glm::radians(rotacion.y), glm::vec3(0.0f, 1.0f, 0.0f));
+	modelSilla = glm::rotate(modelSilla, glm::radians(rotacion.z), glm::vec3(0.0f, 0.0f, 1.0f));
+    modelSilla = glm::scale(modelSilla, escala);
     glActiveTexture(GL_TEXTURE0);
     glUniform1i(matDiffLoc, 0);
 

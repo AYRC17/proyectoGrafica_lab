@@ -4,6 +4,9 @@
 
 Pikachu::Pikachu(glm::vec3 posInicial) {
     posicion = posInicial;
+    rotacion = glm::vec3(0.0f, 0.0f, 0.0f);
+    escala = glm::vec3(1.0f, 1.0f, 1.0f);
+	
 
     // Inicialización de articulaciones en posición de reposo (0 grados)
     rotCabezaX = 0.0f; rotCabezaY = 0.0f;
@@ -87,6 +90,10 @@ void Pikachu::Draw(Shader& shader, GLuint VAO) {
     glUniform1i(matDiffLoc, 0);
 
     glm::mat4 mRaiz = glm::translate(glm::mat4(1.0f), posicion);
+    mRaiz = glm::rotate(mRaiz, glm::radians(rotacion.x), glm::vec3(1.0f, 0.0f, 0.0f));
+    mRaiz = glm::rotate(mRaiz, glm::radians(rotacion.y), glm::vec3(0.0f, 1.0f, 0.0f));
+    mRaiz = glm::rotate(mRaiz, glm::radians(rotacion.z), glm::vec3(0.0f, 0.0f, 1.0f));
+    mRaiz = glm::scale(mRaiz, escala);
 
     //TORSO 
     glBindTexture(GL_TEXTURE_2D, texturaCuerpo); // Textura general

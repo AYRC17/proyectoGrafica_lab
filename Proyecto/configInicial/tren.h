@@ -8,6 +8,7 @@
 class Tren {
 public:
     glm::vec3 posicion;
+    glm::vec3 escala;
     float avance;
     float rotacionLlantas;
 

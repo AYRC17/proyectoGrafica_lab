@@ -4,6 +4,7 @@
 
 Carro::Carro(glm::vec3 posInicial) {
     posicion = posInicial;
+    escala = glm::vec3(1.0f, 1.0f, 1.0f);
     avance = 0.0f;
     rotacionLlantas = 0.0f;
     giroVolante = 0.0f;
@@ -135,7 +136,10 @@ void Carro::Draw(Shader& shader, GLuint VAO) {
     glm::mat4 modelCarro = glm::mat4(1.0f);
     modelCarro = glm::translate(modelCarro, posicion);
     modelCarro = glm::translate(modelCarro, glm::vec3(avance, 0.0f, 0.0f));
-
+    modelCarro = glm::rotate(modelCarro, glm::radians(rotacion.x), glm::vec3(1.0f, 0.0f, 0.0f));
+    modelCarro = glm::rotate(modelCarro, glm::radians(rotacion.y), glm::vec3(0.0f, 1.0f, 0.0f));
+    modelCarro = glm::rotate(modelCarro, glm::radians(rotacion.z), glm::vec3(0.0f, 0.0f, 1.0f));
+    modelCarro = glm::scale(modelCarro, escala);
     // DIBUJAR CHASIS
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

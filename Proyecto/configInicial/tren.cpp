@@ -4,6 +4,8 @@
 
 Tren::Tren(glm::vec3 posInicial) {
     posicion = posInicial;
+    escala = glm::vec3(1.0f, 1.0f, 1.0f);
+    
     avance = 0.0f;
     rotacionLlantas = 0.0f;
 }
@@ -138,6 +140,7 @@ void Tren::Draw(Shader& shader, GLuint VAO) {
     glm::mat4 modelTren = glm::mat4(1.0f);
     modelTren = glm::translate(modelTren, posicion);
     modelTren = glm::translate(modelTren, glm::vec3(avance, 0.0f, 0.0f));
+    modelTren = glm::scale(modelTren, escala);
 
     glActiveTexture(GL_TEXTURE0);
     glUniform1i(matDiffLoc, 0);

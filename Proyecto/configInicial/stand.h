@@ -8,6 +8,8 @@
 class Stand {
 public:
     glm::vec3 posicion;
+    glm::vec3 escala;
+    glm::vec3 rotacion;
     GLuint texturaMetal;
     GLuint texturaPanel;
 

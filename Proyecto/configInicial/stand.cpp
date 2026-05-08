@@ -4,6 +4,9 @@
 
 Stand::Stand(glm::vec3 posInicial) {
     posicion = posInicial;
+    rotacion = glm::vec3(0.0f, 0.0f, 0.0f);
+    escala = glm::vec3(1.0f, 1.0f, 1.0f);
+    
 }
 
 void Stand::Inicializar() {
@@ -59,7 +62,11 @@ void Stand::Draw(Shader& shader, GLuint VAO) {
     glUniform1i(matDiffLoc, 0);
 
     glm::mat4 mRaiz = glm::translate(glm::mat4(1.0f), posicion);
-
+	mRaiz = glm::rotate(mRaiz, glm::radians(rotacion.x), glm::vec3(1.0f, 0.0f, 0.0f));
+	mRaiz = glm::rotate(mRaiz, glm::radians(rotacion.y), glm::vec3(0.0f, 1.0f, 0.0f));
+	mRaiz = glm::rotate(mRaiz, glm::radians(rotacion.z), glm::vec3(0.0f, 0.0f, 1.0f));
+    mRaiz = glm::scale(mRaiz, escala);
+    
     // Definimos un grosor general para todos los tubos
     float grosor = 0.05f;
 

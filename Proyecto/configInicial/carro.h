@@ -8,6 +8,8 @@
 class Carro {
 public:
     glm::vec3 posicion;
+    glm::vec3 escala;
+    glm::vec3 rotacion;
     float rotacionLlantas;
     float giroVolante;
     float avance;

@@ -42,7 +42,7 @@ const GLuint WIDTH = 800, HEIGHT = 600;
 int SCREEN_WIDTH, SCREEN_HEIGHT;
 
 // Camera
-Camera  camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera  camera(glm::vec3(15.0f, 1.0f, 15.0f));
 GLfloat lastX = WIDTH / 2.0;
 GLfloat lastY = HEIGHT / 2.0;
 bool keys[1024];
@@ -110,23 +110,29 @@ float vertices[] = {
 
 
 glm::vec3 Light1 = glm::vec3(0);
-//Anim
-bool AnimBall = false;
 
 //declaracion de objetos
-Carro CarroAzul(glm::vec3(0.0f, 0.0f, 0.0f));
+Carro CarroAzul(glm::vec3(37.0f, 0.050f, 13.0f));
 bool AnimCarro = false;
-Tren TrenRojo(glm::vec3(3.0f, 0.0f, 3.0f));
+
+Tren TrenRojo(glm::vec3(-1.0f, 0.0f, -26.0f));
 bool AnimTren = false;
-Silla SillaPlegable(glm::vec3(-2.0f, 0.0f, -2.0f));
-bool PlegarSilla = false;
-bool DesplegarSilla = false;
-Mesa MesaPlegable(glm::vec3(5.0f, 0.0f, -3.0f));
-bool AbrirMesa = false;
-bool CerrarMesa = false;
-Pikachu botarga(glm::vec3(-5.0f, 0.0f, 5.0f));
-Stand stand1(glm::vec3(0.0f, 0.0f, -5.0f));
-Persona persona1(glm::vec3(2.0f, 0.0f, -4.0f));
+
+Silla SillaPlegable(glm::vec3(6.5f, 0.050f, -4.5f));
+bool AnimSilla = false;      // Estado de animación de la silla
+bool SillaAbierta = false;   // Estado actual de la silla (abierta/cerrada)
+bool AnimacionEnProgreso = false;
+
+Mesa MesaPlegable(glm::vec3(6.5f, 0.77f, -4.0f));
+bool AnimMesa = false;           // Estado de animación de la mesa
+bool MesaAbierta = false;        // Estado actual de la mesa (abierta/cerrada)
+bool AnimacionMesaEnProgreso = false;  // Para evitar múltiples activaciones
+
+Pikachu botarga(glm::vec3(9.3f, 0.050f, -4.0f));
+
+Stand stand1(glm::vec3(6.8f, 0.0f, -1.5f));
+
+Persona persona1(glm::vec3(7.0f, 0.13f, -4.0f));
 
 // Deltatime
 GLfloat deltaTime = 0.0f;	// Time between current frame and last frame
@@ -192,8 +198,7 @@ int main()
 	
 	//models
 	Model Sotano((char*)"Models/SotanoA.obj");
-	Model Piso((char*)"Models/piso.obj");
-	
+
 	// First, set the container's VAO (and VBO)
 	GLuint VBO, VAO;
 	glGenVertexArrays(1, &VAO);
@@ -311,22 +316,31 @@ int main()
         view = camera.GetViewMatrix();	
 		model = glm::mat4(1);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Piso.Draw(lightingShader);
+		Sotano.Draw(lightingShader);
+		
 
-	/*	model = glm::mat4(1);
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-		Sotano.Draw(lightingShader);*/
-		
-		
+		//Dibujar modelos 
+		CarroAzul.escala = glm::vec3(1.1f, 1.1f, 1.1f);
 		CarroAzul.Draw(lightingShader, VAO);
-		//dibujar tren
+		
+		TrenRojo.escala = glm::vec3(3.0f,2.2f,2.5f);
 		TrenRojo.Draw(lightingShader, VAO);
+		
+		SillaPlegable.rotacion = glm::vec3(0.0f, 180.0f, 0.0f);
 		SillaPlegable.Draw(lightingShader, VAO);
+		
 		MesaPlegable.Draw(lightingShader, VAO);
+		
+		botarga.escala = glm::vec3(0.47f, 0.47f, 0.47f);
 		botarga.Draw(lightingShader, VAO);
+		
+		stand1.rotacion = glm::vec3(0.0f, 180.0f, 0.0f);
+		stand1.escala = glm::vec3(1.0f, 0.7f, 1.0f);
 		stand1.Draw(lightingShader, VAO);
+		
+		persona1.escala = glm::vec3(0.42f, 0.42f, 0.42f);
 		persona1.Draw(lightingShader, VAO);
+
 		// Also draw the lamp object, again binding the appropriate shader
 		lampShader.Use();
 
@@ -352,9 +366,6 @@ int main()
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		
 		glBindVertexArray(0);
-
-
-
 		// Swap the screen buffers
 		glfwSwapBuffers(window);
 	}
@@ -436,40 +447,32 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode
 			Light1 = glm::vec3(0);//Cuado es solo un valor en los 3 vectores pueden dejar solo una componente
 		}
 	}
-	if (keys[GLFW_KEY_N])
-	{
-		AnimBall = !AnimBall;
-		
-	}
+	
 	if (keys[GLFW_KEY_M])
 	{
 		AnimCarro = !AnimCarro;
 	}
 
-	if (keys[GLFW_KEY_O]) {
-		PlegarSilla = true;
+	if (keys[GLFW_KEY_O] && !AnimacionEnProgreso)
+	{
+		AnimSilla = !AnimSilla;// Alterna entre abrir y cerrar
+		SillaAbierta = !SillaAbierta;
+		AnimacionEnProgreso = true;
 	}
-	else {
-		PlegarSilla = false;
+	else if (!keys[GLFW_KEY_O])
+	{
+		AnimacionEnProgreso = false;
 	}
-	// Mantener presionada la 'P' para desplegar
-	if (keys[GLFW_KEY_P]) {
-		DesplegarSilla = true;
+
+	if (keys[GLFW_KEY_L] && !AnimacionMesaEnProgreso)
+	{
+		AnimMesa = !AnimMesa;        // Cambia el estado de animación
+		MesaAbierta = !MesaAbierta;   // Cambia el estado de la mesa
+		AnimacionMesaEnProgreso = true;
 	}
-	else {
-		DesplegarSilla = false;
-	}
-	if (keys[GLFW_KEY_L]) {
-		AbrirMesa = true;
-	}
-	else {
-		AbrirMesa = false;
-	}
-	if (keys[GLFW_KEY_K]) {
-		CerrarMesa = true;
-	}
-	else {
-		CerrarMesa = false;
+	else if (!keys[GLFW_KEY_L])
+	{
+		AnimacionMesaEnProgreso = false;
 	}
 }
 void Animation() {
@@ -481,18 +484,33 @@ void Animation() {
 		// El carro avanza sobre el eje X
 		CarroAzul.avance += 2.0f * deltaTime;
 	}
-	if (PlegarSilla && SillaPlegable.anguloPlegado < 80.0f) {
-		SillaPlegable.anguloPlegado += 50.0f * deltaTime; // La silla se cierra
+	if (AnimMesa) {
+		// Abrir mesa (0° a 180°)
+		if (MesaAbierta && MesaPlegable.anguloApertura < 180.0f) {
+			MesaPlegable.anguloApertura += 60.0f * deltaTime;
+		}
+		// Cerrar mesa (180° a 90°)
+		else if (!MesaAbierta && MesaPlegable.anguloApertura > 90.0f) {
+			MesaPlegable.anguloApertura -= 60.0f * deltaTime;
+		}
+		else {
+			AnimMesa = false;  // Termina animación
+		}
 	}
-	if (DesplegarSilla && SillaPlegable.anguloPlegado > 0.0f) {
-		SillaPlegable.anguloPlegado -= 50.0f * deltaTime; // La silla se abre
-	}
-
-	if (AbrirMesa && MesaPlegable.anguloApertura < 180.0f) {
-		MesaPlegable.anguloApertura += 60.0f * deltaTime;
-	}
-	if (CerrarMesa && MesaPlegable.anguloApertura > 90.0f) {
-		MesaPlegable.anguloApertura -= 60.0f * deltaTime;
+	if (AnimSilla) {
+		// Si la silla está abierta, ciérrala
+		if (SillaAbierta && SillaPlegable.anguloPlegado < 80.0f) {
+			SillaPlegable.anguloPlegado += 50.0f * deltaTime;
+		}
+		// Si la silla está cerrada, ábrela
+		else if (!SillaAbierta && SillaPlegable.anguloPlegado > 0.0f) {
+			SillaPlegable.anguloPlegado -= 50.0f * deltaTime;
+		}
+		// Cuando termina la animación, desactiva AnimSilla
+		else if ((SillaAbierta && SillaPlegable.anguloPlegado >= 80.0f) ||
+			(!SillaAbierta && SillaPlegable.anguloPlegado <= 0.0f)) {
+			AnimSilla = false;
+		}
 	}
 }
 

@@ -4,6 +4,8 @@
 
 Mesa::Mesa(glm::vec3 posInicial) {
     posicion = posInicial;
+	rotacion = glm::vec3(0.0f, 0.0f, 0.0f);
+    escala = glm::vec3(1.0f, 1.0f, 1.0f);
     anguloApertura = 90.0f; // Inicia cerrada según instrucciones
 }
 
@@ -53,7 +55,10 @@ void Mesa::Draw(Shader& shader, GLuint VAO) {
     glUniform1i(matDiffLoc, 0);
 
     glm::mat4 modelMesa = glm::translate(glm::mat4(1.0f), posicion);
-
+	modelMesa = glm::rotate(modelMesa, glm::radians(rotacion.x), glm::vec3(1.0f, 0.0f, 0.0f));
+	modelMesa = glm::rotate(modelMesa, glm::radians(rotacion.y), glm::vec3(0.0f, 1.0f, 0.0f));
+	modelMesa = glm::rotate(modelMesa, glm::radians(rotacion.z), glm::vec3(0.0f, 0.0f, 1.0f));
+    modelMesa = glm::scale(modelMesa, escala);
     // rotTablero: 90 (cerrada vertical) -> 0 (abierta horizontal)
     float rotTablero = 180.0f - anguloApertura;
 

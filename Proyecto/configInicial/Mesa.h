@@ -8,7 +8,8 @@
 class Mesa {
 public:
     glm::vec3 posicion;
-
+    glm::vec3 escala;
+    glm::vec3 rotacion;
     // 90.0f = Cerrada, 180.0f = Abierta
     float anguloApertura;
 

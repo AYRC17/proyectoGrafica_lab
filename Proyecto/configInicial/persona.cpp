@@ -3,6 +3,8 @@
 
 Persona::Persona(glm::vec3 posInicial) {
     posicion = posInicial;
+	rotacion = glm::vec3(0.0f, 0.0f, 0.0f);
+    escala = glm::vec3(1.0f, 1.0f, 1.0f);
 
     // Inicialización en Pose T (Brazos extendidos)
     rotCuelloX = 0.0f; rotCuelloY = 0.0f;
@@ -49,8 +51,12 @@ void Persona::Draw(Shader& shader, GLuint VAO) {
 
     // Matriz Raíz
     glm::mat4 mRaiz = glm::translate(glm::mat4(1.0f), posicion);
+	mRaiz = glm::rotate(mRaiz, glm::radians(rotacion.x), glm::vec3(1.0f, 0.0f, 0.0f));
+	mRaiz = glm::rotate(mRaiz, glm::radians(rotacion.y), glm::vec3(0.0f, 1.0f, 0.0f));
+	mRaiz = glm::rotate(mRaiz, glm::radians(rotacion.z), glm::vec3(0.0f, 0.0f, 1.0f));
+    mRaiz = glm::scale(mRaiz, escala);
 
-    // ================= 1. TORSO (Playera) =================
+    // TORSO (Playera) 
     glBindTexture(GL_TEXTURE_2D, texturaPlayera);
     // Posicionamos el torso a una altura de 1.8 para dejar espacio a las piernas
     glm::mat4 mTorsoBase = glm::translate(mRaiz, glm::vec3(0.0f, 1.8f, 0.0f));
@@ -58,12 +64,13 @@ void Persona::Draw(Shader& shader, GLuint VAO) {
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(mTorsoDraw));
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
-    // ================= 2. CABEZA Y CUELLO =================
+    // CABEZA Y CUELLO
     // Cuello (Pivote)
+    glBindTexture(GL_TEXTURE_2D, texturaPiel);
     glm::mat4 mCuelloPivote = glm::translate(mTorsoBase, glm::vec3(0.0f, 0.5f, 0.0f));
     mCuelloPivote = glm::rotate(mCuelloPivote, glm::radians(rotCuelloY), glm::vec3(0.0f, 1.0f, 0.0f));
     mCuelloPivote = glm::rotate(mCuelloPivote, glm::radians(rotCuelloX), glm::vec3(1.0f, 0.0f, 0.0f));
-
+    glDrawArrays(GL_TRIANGLES, 0, 36);
     // Cabeza (Piel)
     glBindTexture(GL_TEXTURE_2D, texturaPiel);
     glm::mat4 mCabezaDraw = glm::translate(mCuelloPivote, glm::vec3(0.0f, 0.3f, 0.0f));
@@ -119,8 +126,8 @@ void Persona::Draw(Shader& shader, GLuint VAO) {
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(mCabello));
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
-    // ================= 3. BRAZOS =================
-    // --- BRAZO IZQUIERDO ---
+    // BRAZOS
+    //BRAZO IZQUIERDO
     glBindTexture(GL_TEXTURE_2D, texturaPlayera); // Manga corta
     glm::mat4 mHombroIzq = glm::translate(mTorsoBase, glm::vec3(-0.45f, 0.4f, 0.0f));
     mHombroIzq = glm::rotate(mHombroIzq, glm::radians(rotHombroIzqX), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -147,7 +154,7 @@ void Persona::Draw(Shader& shader, GLuint VAO) {
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(mManoIzq));
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
-    // --- BRAZO DERECHO ---
+    //BRAZO DERECHO
     glBindTexture(GL_TEXTURE_2D, texturaPlayera); // Manga corta
     glm::mat4 mHombroDer = glm::translate(mTorsoBase, glm::vec3(0.45f, 0.4f, 0.0f));
     mHombroDer = glm::rotate(mHombroDer, glm::radians(rotHombroDerX), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -174,8 +181,8 @@ void Persona::Draw(Shader& shader, GLuint VAO) {
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(mManoDer));
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
-    // ================= 4. PIERNAS =================
-    // --- PIERNA IZQUIERDA ---
+    //PIERNAS
+    //PIERNA IZQUIERDA
     glBindTexture(GL_TEXTURE_2D, texturaPantalon); // Shorts
     glm::mat4 mCaderaIzq = glm::translate(mTorsoBase, glm::vec3(-0.2f, -0.5f, 0.0f));
     mCaderaIzq = glm::rotate(mCaderaIzq, glm::radians(rotPiernaIzqX), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -195,14 +202,14 @@ void Persona::Draw(Shader& shader, GLuint VAO) {
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(mPantorrillaIzqDraw));
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
-    // Pie/Sandalia Izquierda
+    // Pie Izquierda
     glBindTexture(GL_TEXTURE_2D, texturaSandalias);
     glm::mat4 mPieIzq = glm::translate(mRodillaIzq, glm::vec3(0.0f, -0.85f, 0.08f));
     mPieIzq = glm::scale(mPieIzq, glm::vec3(0.22f, 0.1f, 0.35f));
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(mPieIzq));
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
-    // --- PIERNA DERECHA ---
+    //PIERNA DERECHA
     glBindTexture(GL_TEXTURE_2D, texturaPantalon); // Shorts
     glm::mat4 mCaderaDer = glm::translate(mTorsoBase, glm::vec3(0.2f, -0.5f, 0.0f));
     mCaderaDer = glm::rotate(mCaderaDer, glm::radians(rotPiernaDerX), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -222,7 +229,7 @@ void Persona::Draw(Shader& shader, GLuint VAO) {
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(mPantorrillaDerDraw));
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
-    // Pie/Sandalia Derecha
+    // Pie Derecha
     glBindTexture(GL_TEXTURE_2D, texturaSandalias);
     glm::mat4 mPieDer = glm::translate(mRodillaDer, glm::vec3(0.0f, -0.85f, 0.08f));
     mPieDer = glm::scale(mPieDer, glm::vec3(0.22f, 0.1f, 0.35f));
