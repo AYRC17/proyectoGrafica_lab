@@ -15,5 +15,5 @@ public:
 
     Stand(glm::vec3 posInicial);
     void Inicializar();
-    void Draw(Shader& shader, GLuint VAO);
+    void Draw(Shader& shader, GLuint VAO, glm::mat4 matrizPadre = glm::mat4(1.0f));
 };

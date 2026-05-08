@@ -118,21 +118,21 @@ bool AnimCarro = false;
 Tren TrenRojo(glm::vec3(-1.0f, 0.0f, -26.0f));
 bool AnimTren = false;
 
-Silla SillaPlegable(glm::vec3(6.5f, 0.050f, -4.5f));
+Silla SillaPlegable(glm::vec3(6.8f, 0.050f, -0.53));
 bool AnimSilla = false;      // Estado de animación de la silla
 bool SillaAbierta = false;   // Estado actual de la silla (abierta/cerrada)
 bool AnimacionEnProgreso = false;
 
-Mesa MesaPlegable(glm::vec3(6.5f, 0.77f, -4.0f));
+Mesa MesaPlegable(glm::vec3(6.8f, 0.74f, -1.8f));
 bool AnimMesa = false;           // Estado de animación de la mesa
 bool MesaAbierta = false;        // Estado actual de la mesa (abierta/cerrada)
 bool AnimacionMesaEnProgreso = false;  // Para evitar múltiples activaciones
 
-Pikachu botarga(glm::vec3(9.3f, 0.050f, -4.0f));
+Stand stand1(glm::vec3(6.8f, 0.03f, -1.5f));
 
-Stand stand1(glm::vec3(6.8f, 0.0f, -1.5f));
+Pikachu botarga(glm::vec3(19.0f, 0.050f, 2.7f));
 
-Persona persona1(glm::vec3(7.0f, 0.13f, -4.0f));
+Persona persona1(glm::vec3(6.8f, 0.13f, -1.1f));
 
 // Deltatime
 GLfloat deltaTime = 0.0f;	// Time between current frame and last frame
@@ -320,6 +320,7 @@ int main()
 		
 
 		//Dibujar modelos 
+		CarroAzul.rotacion = glm::vec3(0.0f, 180.0f, 0.0f);
 		CarroAzul.escala = glm::vec3(1.1f, 1.1f, 1.1f);
 		CarroAzul.Draw(lightingShader, VAO);
 		
@@ -338,6 +339,7 @@ int main()
 		stand1.escala = glm::vec3(1.0f, 0.7f, 1.0f);
 		stand1.Draw(lightingShader, VAO);
 		
+		persona1.rotacion = glm::vec3(0.0f, 180.0f, 0.0f);
 		persona1.escala = glm::vec3(0.42f, 0.42f, 0.42f);
 		persona1.Draw(lightingShader, VAO);
 

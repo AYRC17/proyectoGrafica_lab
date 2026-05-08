@@ -51,7 +51,7 @@ void Stand::Inicializar() {
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void Stand::Draw(Shader& shader, GLuint VAO) {
+void Stand::Draw(Shader& shader, GLuint VAO, glm::mat4 matrizPadre) {
     GLint modelLoc = glGetUniformLocation(shader.Program, "model");
     GLint matDiffLoc = glGetUniformLocation(shader.Program, "material.diffuse");
 
@@ -61,7 +61,7 @@ void Stand::Draw(Shader& shader, GLuint VAO) {
     glBindTexture(GL_TEXTURE_2D, texturaMetal);
     glUniform1i(matDiffLoc, 0);
 
-    glm::mat4 mRaiz = glm::translate(glm::mat4(1.0f), posicion);
+    glm::mat4 mRaiz = glm::translate(matrizPadre, posicion);
 	mRaiz = glm::rotate(mRaiz, glm::radians(rotacion.x), glm::vec3(1.0f, 0.0f, 0.0f));
 	mRaiz = glm::rotate(mRaiz, glm::radians(rotacion.y), glm::vec3(0.0f, 1.0f, 0.0f));
 	mRaiz = glm::rotate(mRaiz, glm::radians(rotacion.z), glm::vec3(0.0f, 0.0f, 1.0f));

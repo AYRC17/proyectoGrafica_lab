@@ -46,7 +46,7 @@ void Mesa::Inicializar() {
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void Mesa::Draw(Shader& shader, GLuint VAO) {
+void Mesa::Draw(Shader& shader, GLuint VAO, glm::mat4 matrizPadre) {
     GLint modelLoc = glGetUniformLocation(shader.Program, "model");
     GLint matDiffLoc = glGetUniformLocation(shader.Program, "material.diffuse");
 
@@ -54,7 +54,7 @@ void Mesa::Draw(Shader& shader, GLuint VAO) {
     glActiveTexture(GL_TEXTURE0);
     glUniform1i(matDiffLoc, 0);
 
-    glm::mat4 modelMesa = glm::translate(glm::mat4(1.0f), posicion);
+    glm::mat4 modelMesa = glm::translate(matrizPadre, posicion);
 	modelMesa = glm::rotate(modelMesa, glm::radians(rotacion.x), glm::vec3(1.0f, 0.0f, 0.0f));
 	modelMesa = glm::rotate(modelMesa, glm::radians(rotacion.y), glm::vec3(0.0f, 1.0f, 0.0f));
 	modelMesa = glm::rotate(modelMesa, glm::radians(rotacion.z), glm::vec3(0.0f, 0.0f, 1.0f));

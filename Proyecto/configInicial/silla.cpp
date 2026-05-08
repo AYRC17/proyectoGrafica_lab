@@ -50,15 +50,14 @@ void Silla::Inicializar() {
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void Silla::Draw(Shader& shader, GLuint VAO) {
+void Silla::Draw(Shader& shader, GLuint VAO, glm::mat4 matrizPadre) {
     GLint modelLoc = glGetUniformLocation(shader.Program, "model");
     GLint matDiffLoc = glGetUniformLocation(shader.Program, "material.diffuse");
 
     glBindVertexArray(VAO);
     glDisable(GL_BLEND);
-
-    glm::mat4 modelSilla = glm::mat4(1.0f);
-    modelSilla = glm::translate(modelSilla, posicion);
+    glm::mat4 modelSilla = glm::translate(matrizPadre, posicion);
+    
 	modelSilla = glm::rotate(modelSilla, glm::radians(rotacion.x), glm::vec3(1.0f, 0.0f, 0.0f));
 	modelSilla = glm::rotate(modelSilla, glm::radians(rotacion.y), glm::vec3(0.0f, 1.0f, 0.0f));
 	modelSilla = glm::rotate(modelSilla, glm::radians(rotacion.z), glm::vec3(0.0f, 0.0f, 1.0f));
