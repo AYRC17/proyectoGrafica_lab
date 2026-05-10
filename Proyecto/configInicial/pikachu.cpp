@@ -9,10 +9,10 @@ Pikachu::Pikachu(glm::vec3 posInicial) {
 	
 
     // Inicialización de articulaciones en posición de reposo (0 grados)
-    rotCabezaX = 0.0f; rotCabezaY = 0.0f;
-    rotHombroIzqX = 0.0f; rotHombroIzqZ = -30.0f; // Ligeramente despegados del cuerpo
+    rotCabezaX = 0.0f; rotCabezaY = 0.0f; rotCabezaZ = 0.0f;
+    rotHombroIzqX = 0.0f; rotHombroIzqZ = 60.0f; rotHombroIzqY = 0.0f; // Ligeramente despegados del cuerpo
     rotCodoIzq = 0.0f;
-    rotHombroDerX = 0.0f; rotHombroDerZ = 30.0f;
+    rotHombroDerX = 0.0f; rotHombroDerZ = -60.0f; rotHombroDerY = 0.0f;
     rotCodoDer = 0.0f;
     rotPiernaIzqX = 0.0f; rotRodillaIzq = 0.0f;
     rotPiernaDerX = 0.0f; rotRodillaDer = 0.0f;
@@ -107,6 +107,7 @@ void Pikachu::Draw(Shader& shader, GLuint VAO) {
     glm::mat4 mCuelloPivote = glm::translate(mTorsoBase, glm::vec3(0.0f, 0.75f, 0.0f));
     mCuelloPivote = glm::rotate(mCuelloPivote, glm::radians(rotCabezaY), glm::vec3(0.0f, 1.0f, 0.0f));
     mCuelloPivote = glm::rotate(mCuelloPivote, glm::radians(rotCabezaX), glm::vec3(1.0f, 0.0f, 0.0f));
+    mCuelloPivote = glm::rotate(mCuelloPivote, glm::radians(rotCabezaZ), glm::vec3(0.0f, 0.0f, 1.0f));
 
     // Cabeza
     glm::mat4 mCabezaDraw = glm::translate(mCuelloPivote, glm::vec3(0.0f, 0.5f, 0.0f));
@@ -186,6 +187,7 @@ void Pikachu::Draw(Shader& shader, GLuint VAO) {
     glm::mat4 mHombroIzq = glm::translate(mTorsoBase, glm::vec3(-0.65f, 0.5f, 0.0f));
     mHombroIzq = glm::rotate(mHombroIzq, glm::radians(rotHombroIzqX), glm::vec3(1.0f, 0.0f, 0.0f));
     mHombroIzq = glm::rotate(mHombroIzq, glm::radians(rotHombroIzqZ), glm::vec3(0.0f, 0.0f, 1.0f));
+	mHombroIzq = glm::rotate(mHombroIzq, glm::radians(rotHombroIzqY), glm::vec3(0.0f, 1.0f, 0.0f));
 
     glm::mat4 mBrazoIzqDraw = glm::translate(mHombroIzq, glm::vec3(-0.25f, 0.0f, 0.0f));
     mBrazoIzqDraw = glm::scale(mBrazoIzqDraw, glm::vec3(0.5f, 0.35f, 0.35f));
@@ -212,7 +214,7 @@ void Pikachu::Draw(Shader& shader, GLuint VAO) {
     glm::mat4 mHombroDer = glm::translate(mTorsoBase, glm::vec3(0.65f, 0.5f, 0.0f));
     mHombroDer = glm::rotate(mHombroDer, glm::radians(rotHombroDerX), glm::vec3(1.0f, 0.0f, 0.0f));
     mHombroDer = glm::rotate(mHombroDer, glm::radians(rotHombroDerZ), glm::vec3(0.0f, 0.0f, 1.0f));
-
+	mHombroDer = glm::rotate(mHombroDer, glm::radians(rotHombroDerY), glm::vec3(0.0f, 1.0f, 0.0f));
     glm::mat4 mBrazoDerDraw = glm::translate(mHombroDer, glm::vec3(0.25f, 0.0f, 0.0f));
     mBrazoDerDraw = glm::scale(mBrazoDerDraw, glm::vec3(0.5f, 0.35f, 0.35f));
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(mBrazoDerDraw));

@@ -11,14 +11,14 @@ public:
     glm::vec3 escala;
     glm::vec3 rotacion;
     // --- Ángulos de Articulación ---
-    float rotCabezaX, rotCabezaY;
+    float rotCabezaX, rotCabezaY, rotCabezaZ;
 
     // Brazo Izquierdo
-    float rotHombroIzqX, rotHombroIzqZ;
+    float rotHombroIzqX, rotHombroIzqZ, rotHombroIzqY;
     float rotCodoIzq;
 
     // Brazo Derecho
-    float rotHombroDerX, rotHombroDerZ;
+    float rotHombroDerX, rotHombroDerZ, rotHombroDerY;
     float rotCodoDer;
 
     // Pierna Izquierda
