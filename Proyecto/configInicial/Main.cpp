@@ -135,13 +135,20 @@ bool animPikachuDance = false;
 
 // Estructura para guardar las articulaciones de cada pose
 typedef struct _frame {
-	float posY;          // Rebote del cuerpo
-	float pDerX;         // Pierna Derecha X
-	float pIzqX;         // Pierna Izquierda X
-	float hIzqX;         // Hombro Izquierdo X
-	float cIzq;          // Codo Izquierdo
-	float hDerX;         // Hombro Derecho X
-	float cDer;          // Codo Derecho
+	float posY;   // Rebote vertical del cuerpo
+	float pDerX;  // Pierna Derecha
+	float pIzqX;  // Pierna Izquierda
+	float cZ;    // Movimiento rítmico de cabeza
+	// Brazo Izquierdo
+	float hIzqX;  // Giro del hombro izquierdo sobre sí mismo
+	float hIzqY;  // Mueve el brazo izquierdo hacia el frente
+	float hIzqZ;  // Levanta o baja el brazo izquierdo
+	float cIzq;   // Dobla el codo izquierdo hacia la cara
+	// Brazo Derecho
+	float hDerX;  // Giro del hombro derecho sobre sí mismo
+	float hDerY;  // Mueve el brazo derecho hacia el frente
+	float hDerZ;  // Levanta o baja el brazo derecho
+	float cDer;   // Dobla el codo derecho
 } FRAME;
 
 #define MAX_FRAMES 4
@@ -152,7 +159,9 @@ int i_max_steps = 180;    // Velocidad de interpolación (menor = más rápido e
 int i_curr_steps = 0;    // Contador de pasos actual
 
 // Variables de incremento para suavizar la animación
-float inc_posY, inc_pDerX, inc_pIzqX, inc_hIzqX, inc_cIzq, inc_hDerX, inc_cDer;
+float inc_posY, inc_pDerX, inc_pIzqX, inc_cZ;
+float inc_hIzqX, inc_hIzqY, inc_hIzqZ, inc_cIzq;
+float inc_hDerX, inc_hDerY, inc_hDerZ, inc_cDer;
 
 Pikachu botarga2(glm::vec3(-17.0f, 0.05f, 2.7f));
 bool animScubaCat = false;
@@ -160,8 +169,8 @@ bool animScubaCat = false;
 typedef struct _frameScuba {
 	float posX;   // Desplazamiento lateral del cuerpo
 	float posY;   // Rebote vertical del cuerpo
-	float pDerX;  // Giro de la pierna derecha
-	float pIzqX;  // Giro de la pierna izquierda
+	float pDerX;  // Pierna Derecha
+	float pIzqX;  // Pierna Izquierda
 	float cZ;    // Inclinación lateral de la cabeza
 	// Brazo Izquierdo (Mano en la boca)
 	float hIzqX;  // Giro del hombro izquierdo sobre sí mismo
@@ -260,56 +269,63 @@ int main()
 
 	botarga.Inicializar();
 	// GUARDADO DE KEYFRAMES rat dance
-	//Frame 0: Cruce Derecho (Salto hacia arriba)
-	KeyFrame[0].posY = -0.3f;
-	KeyFrame[0].pDerX = 20.0f; KeyFrame[0].pIzqX = -10.0f;
-	KeyFrame[0].hIzqX = 190.0f; KeyFrame[0].cIzq = -90.0f; //Brazo izquierdo
-	KeyFrame[0].hDerX = -15.0f; KeyFrame[0].cDer = 0.0f;
+	//Frame 0:
+	KeyFrame[0].posY = -0.2f;  // Rebote arriba
+	KeyFrame[0].pDerX = 0.0f; KeyFrame[0].pIzqX = 0.0f; // Cruce de pies
+	KeyFrame[0].cZ = 0.0f; // Cabeza acompaña el ritmo
+	//Brazo izquierdo
+	KeyFrame[0].hIzqX = 15.0f; KeyFrame[0].hIzqY = -50.0f; KeyFrame[0].hIzqZ = 40.0f; KeyFrame[0].cIzq = -90.0f; 
+	KeyFrame[0].hDerX = -30.0f; KeyFrame[0].hDerY = 30.0f; KeyFrame[0].hDerZ = 10.0f; KeyFrame[0].cDer = 0.0f;
 
-	//Frame 1: Descruce (Aterrizaje pies separados)
-	KeyFrame[1].posY = 0.0f;
-	KeyFrame[1].pDerX = 0.0f; KeyFrame[1].pIzqX = 0.0f;
-	KeyFrame[1].hIzqX = 15.0f; KeyFrame[1].cIzq = 0.0f;
-	KeyFrame[1].hDerX = -90.0f; KeyFrame[1].cDer = 90.0f; //Brazo derecho
+	// Frame 1
+	KeyFrame[1].posY = 0.0f;  // Aterrizaje
+	KeyFrame[1].pDerX = 20.0f; KeyFrame[1].pIzqX = -10.0f; KeyFrame[1].cZ = 10.0f;
+	// Brazos a la mitad del recorrido para dar fluidez
+	KeyFrame[1].hIzqX = 1.0f; KeyFrame[1].hIzqY = 30.0f; KeyFrame[1].hIzqZ = 10.0f; KeyFrame[1].cIzq = 0.0f;
+	KeyFrame[1].hDerX = 10.0f; KeyFrame[1].hDerY = 50.0f; KeyFrame[1].hDerZ = 40.0f; KeyFrame[1].cDer = 90.0f; //Brazo derecho
 
-	//Frame 2: Cruce Izquierdo (Salto hacia arriba)
-	KeyFrame[2].posY = -0.3f;
-	KeyFrame[2].pDerX = -10.0f; KeyFrame[2].pIzqX = 20.0f;
-	KeyFrame[2].hIzqX = 90.0f; KeyFrame[2].cIzq = -90.0f; //Brazo izquierdo
-	KeyFrame[2].hDerX = -15.0f; KeyFrame[2].cDer = 0.0f;
+	// Frame 2: Cruza Pie Izquierdo, Sube Brazo Derecho (Opuesto)
+	KeyFrame[2].posY = 0.2f; 
+	KeyFrame[2].pDerX = -10.0f; KeyFrame[2].pIzqX = 20.0f; KeyFrame[2].cZ = 0.0f;
+	// Brazo Izq (Abajo/Atrás)
+	KeyFrame[2].hIzqX = 15.0f; KeyFrame[2].hIzqY = -50.0f; KeyFrame[2].hIzqZ = 40.0f; KeyFrame[2].cIzq = -90.0f; //Brazo izquierdo
+	KeyFrame[2].hDerX = -30.0f; KeyFrame[2].hDerY = -30.0f; KeyFrame[2].hDerZ = 10.0f; KeyFrame[2].cDer = 0.0f;
 
-	//Frame 3: Descruce (Aterrizaje pies separados)
-	KeyFrame[3].posY = 0.0f;
-	KeyFrame[3].pDerX = 0.0f; KeyFrame[3].pIzqX = 0.0f;
-	KeyFrame[3].hIzqX = 15.0f; KeyFrame[3].cIzq = 0.0f;
-	KeyFrame[3].hDerX = -90.0f; KeyFrame[3].cDer = 90.0f; //Brazo derecho
-	
+	// Frame 3: Descruce (Regreso a postura neutral)
+	KeyFrame[3].posY = 0.0f; 
+	KeyFrame[3].pDerX = 10.0f; KeyFrame[3].pIzqX = -20.0f; KeyFrame[3].cZ = -10.0f;
+	KeyFrame[3].hIzqX = 1.0f; KeyFrame[3].hIzqY = 30.0f; KeyFrame[3].hIzqZ = 10.0f; KeyFrame[3].cIzq = 0.0f;
+	KeyFrame[3].hDerX = 10.0f; KeyFrame[3].hDerY = 50.0f; KeyFrame[3].hDerZ = 40.0f; KeyFrame[3].cDer = 90.0f; //Brazo derecho
+
+
 
 	botarga2.Inicializar();
 	//GUARDADO DE KEYFRAMES DEL SCUBA CAT
 	//Frame 0: Paso a la Izquierda, Pata Izquierda arriba, Derecha baja, ligero agache
 	// Frame 0
 	KeyFrameScuba[0].posX = -0.3f; KeyFrameScuba[0].posY = -0.1f; KeyFrameScuba[0].cZ = 0.0f;
-	KeyFrameScuba[0].hIzqX = 0.0f; KeyFrameScuba[0].hIzqZ = 0.0f; KeyFrameScuba[0].hIzqY = 0.0f; KeyFrameScuba[0].cIzq = 0.0f; // Brazo cerrado a la boca
+	// Brazo Izquierdo (Mano en la boca): Lo llevamos al frente (Y) y lo cerramos (Z)
+	KeyFrameScuba[0].hIzqX = 0.0f; KeyFrameScuba[0].hIzqZ = 0.0f; KeyFrameScuba[0].hIzqY = 0.0f; KeyFrameScuba[0].cIzq = 0.0f;
+	// Brazo Derecho (Recto): Lo mantenemos hacia abajo pero lo levantamos un poco para dar sensación de movimiento
 	KeyFrameScuba[0].hDerX = 0.0f;  KeyFrameScuba[0].hDerZ = 15.0f;  KeyFrameScuba[0].cDer = -15.0f;  // Brazo recto
 	KeyFrameScuba[0].pDerX = 15.0f;  KeyFrameScuba[0].pIzqX = -10.0f;
 
 	// Frame 1
 	KeyFrameScuba[1].posX = 0.0f;  KeyFrameScuba[1].posY = 0.0f; KeyFrameScuba[1].cZ = -20.0f;
-	KeyFrameScuba[1].hIzqX = -135.0f; KeyFrameScuba[1].hIzqZ = 20.0f; KeyFrameScuba[1].hIzqY = -50.0f; KeyFrameScuba[1].cIzq = 55.0f;
-	KeyFrameScuba[1].hDerX = -90.0f;  KeyFrameScuba[1].hDerZ = -15.0f; KeyFrameScuba[1].cDer = 25.0f;
+	KeyFrameScuba[1].hIzqX = -135.0f; KeyFrameScuba[1].hIzqZ = 70.0f; KeyFrameScuba[1].hIzqY = -35.0f; KeyFrameScuba[1].cIzq = 55.0f;
+	KeyFrameScuba[1].hDerX = -90.0f;  KeyFrameScuba[1].hDerZ = -20.0f; KeyFrameScuba[1].cDer = 25.0f;
 	KeyFrameScuba[1].pDerX = 0.0f;   KeyFrameScuba[1].pIzqX = 0.0f;
 
 	// Frame 2
 	KeyFrameScuba[2].posX = 0.3f;  KeyFrameScuba[2].posY = -0.1f; KeyFrameScuba[2].cZ = 0.0f;
-	KeyFrameScuba[2].hIzqX = -135.0f; KeyFrameScuba[2].hIzqZ = 30.0f; KeyFrameScuba[2].hIzqY = -50.0f; KeyFrameScuba[2].cIzq = 55.0f;
+	KeyFrameScuba[2].hIzqX = -135.0f; KeyFrameScuba[2].hIzqZ = 70.0f; KeyFrameScuba[2].hIzqY = -35.0f; KeyFrameScuba[2].cIzq = 55.0f;
 	KeyFrameScuba[2].hDerX = -90.0f;  KeyFrameScuba[2].hDerZ = 15.0f; KeyFrameScuba[2].cDer = -15.0f;
 	KeyFrameScuba[2].pDerX = -10.0f; KeyFrameScuba[2].pIzqX = 15.0f;
 
 	// Frame 3
 	KeyFrameScuba[3].posX = 0.0f;  KeyFrameScuba[3].posY = 0.0f; KeyFrameScuba[3].cZ = 20.0f;
-	KeyFrameScuba[3].hIzqX = -135.0f; KeyFrameScuba[3].hIzqZ = 30.0f; KeyFrameScuba[3].hIzqY = -50.0f; KeyFrameScuba[3].cIzq = 55.0f;
-	KeyFrameScuba[3].hDerX = -90.0f;  KeyFrameScuba[3].hDerZ = -15.0f; KeyFrameScuba[3].cDer = 25.0f;
+	KeyFrameScuba[3].hIzqX = -135.0f; KeyFrameScuba[3].hIzqZ = 70.0f; KeyFrameScuba[3].hIzqY = -35.0f; KeyFrameScuba[3].cIzq = 55.0f;
+	KeyFrameScuba[3].hDerX = -90.0f;  KeyFrameScuba[3].hDerZ = -20.0f; KeyFrameScuba[3].cDer = 25.0f;
 	KeyFrameScuba[3].pDerX = 0.0f;   KeyFrameScuba[3].pIzqX = 0.0f;
 
 
@@ -741,43 +757,60 @@ void Animation() {
 	//RAT DANCE
 	if (animPikachuDance) {
 		if (i_curr_steps >= i_max_steps) {
-			//Cuando terminamos los pasos, avanzamos al siguiente KeyFrame
 			playIndex = (playIndex + 1) % MAX_FRAMES;
 			i_curr_steps = 0;
 		}
 
-		//Si estamos en el paso 0, calculamos cuánto debe incrementarse cada articulación por frame
 		if (i_curr_steps == 0) {
-			int nextFrame = (playIndex + 1) % MAX_FRAMES; // Siguiente frame cíclico
+			int nextFrame = (playIndex + 1) % MAX_FRAMES;
 
 			inc_posY = (KeyFrame[nextFrame].posY - KeyFrame[playIndex].posY) / i_max_steps;
 			inc_pDerX = (KeyFrame[nextFrame].pDerX - KeyFrame[playIndex].pDerX) / i_max_steps;
 			inc_pIzqX = (KeyFrame[nextFrame].pIzqX - KeyFrame[playIndex].pIzqX) / i_max_steps;
+			inc_cZ = (KeyFrame[nextFrame].cZ - KeyFrame[playIndex].cZ) / i_max_steps;
+
+			// Brazo Izquierdo
 			inc_hIzqX = (KeyFrame[nextFrame].hIzqX - KeyFrame[playIndex].hIzqX) / i_max_steps;
+			inc_hIzqY = (KeyFrame[nextFrame].hIzqY - KeyFrame[playIndex].hIzqY) / i_max_steps;
+			inc_hIzqZ = (KeyFrame[nextFrame].hIzqZ - KeyFrame[playIndex].hIzqZ) / i_max_steps;
 			inc_cIzq = (KeyFrame[nextFrame].cIzq - KeyFrame[playIndex].cIzq) / i_max_steps;
+
+			// Brazo Derecho
 			inc_hDerX = (KeyFrame[nextFrame].hDerX - KeyFrame[playIndex].hDerX) / i_max_steps;
+			inc_hDerY = (KeyFrame[nextFrame].hDerY - KeyFrame[playIndex].hDerY) / i_max_steps;
+			inc_hDerZ = (KeyFrame[nextFrame].hDerZ - KeyFrame[playIndex].hDerZ) / i_max_steps;
 			inc_cDer = (KeyFrame[nextFrame].cDer - KeyFrame[playIndex].cDer) / i_max_steps;
 		}
 
-		//Sumar gradualmente los incrementos al modelo (El movimiento suave)
 		botarga.posicion.y += inc_posY;
 		botarga.rotPiernaDerX += inc_pDerX;
 		botarga.rotPiernaIzqX += inc_pIzqX;
+		botarga.rotCabezaZ += inc_cZ;
+
 		botarga.rotHombroIzqX += inc_hIzqX;
+		botarga.rotHombroIzqY += inc_hIzqY;
+		botarga.rotHombroIzqZ += inc_hIzqZ;
 		botarga.rotCodoIzq += inc_cIzq;
+
 		botarga.rotHombroDerX += inc_hDerX;
+		botarga.rotHombroDerY += inc_hDerY;
+		botarga.rotHombroDerZ += inc_hDerZ;
 		botarga.rotCodoDer += inc_cDer;
 
 		i_curr_steps++;
 	}
 	else {
-		//Al apagar el baile, reiniciar variables y pose
+		// Al apagar el baile, reiniciar a la pose oficial de tu constructor en pikachu.cpp
 		playIndex = 0;
 		i_curr_steps = 0;
 		botarga.posicion.y = 0.0f;
 		botarga.rotPiernaDerX = 0.0f; botarga.rotPiernaIzqX = 0.0f;
-		botarga.rotHombroIzqX = 0.0f; botarga.rotCodoIzq = 0.0f;
-		botarga.rotHombroDerX = 0.0f; botarga.rotCodoDer = 0.0f;
+		botarga.rotCabezaZ = 0.0f;
+		// Pose de reposo: Brazos a los costados
+		botarga.rotHombroIzqX = 0.0f; botarga.rotHombroIzqY = 0.0f; botarga.rotHombroIzqZ = 60.0f;
+		botarga.rotCodoIzq = 0.0f;
+		botarga.rotHombroDerX = 0.0f; botarga.rotHombroDerY = 0.0f; botarga.rotHombroDerZ = -60.0f;
+		botarga.rotCodoDer = 0.0f;
 	}
 
 	//SCUBA CAT
