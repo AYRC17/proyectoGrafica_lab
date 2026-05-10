@@ -31,6 +31,7 @@
 #include "pikachu.h"
 #include "stand.h"
 #include "persona.h"
+#include "Lampara.h"
 // Function prototypes
 void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode);
 void MouseCallback(GLFWwindow *window, double xPos, double yPos);
@@ -204,6 +205,7 @@ int estadoCaminando = 0; // 0: Reposo, 1: Pierna Der. Adelante, 2: Pierna Izq. A
 float velocidadCaminata = 80.0f; // Velocidad de rotación de las extremidades
 float limitePaso = 35.0f; // Ángulo máximo que pueden alcanzar las piernas
 
+Lampara lampara1(glm::vec3(17.0f, 3.85f, -5.67f));
 //Silla silla2(glm::vec3(0.0f, 0.050f, 0.3f));
 //Mesa mesa2(glm::vec3(0.0f, 0.74f, -0.5f));
 //Stand stand2(glm::vec3(0.0f, 0.03f, 0.0f));
@@ -263,9 +265,11 @@ int main()
 	stand1.Inicializar();
 	persona1.Inicializar();
 	personaCaminando.Inicializar();
+
 	/*silla2.Inicializar();
 	mesa2.Inicializar();
 	stand2.Inicializar();*/
+	lampara1.Inicializar();
 
 	botarga.Inicializar();
 	// GUARDADO DE KEYFRAMES rat dance
@@ -486,7 +490,8 @@ int main()
 
 		botarga2.escala = glm::vec3(0.47f, 0.47f, 0.47f);
 		botarga2.Draw(lightingShader, VAO);
-
+		
+		
 
 		//float desplazamientoX = 5.0f; // Espacio entre cada set
 
@@ -511,6 +516,23 @@ int main()
 		personaCaminando.escala = glm::vec3(0.42f, 0.42f, 0.42f);
 		personaCaminando.Draw(lightingShader, VAO);
 
+		float desplazamientoX = -6.0f; // Espacio entre cada lampara
+		float desplazamientoZ = -9.0f;
+		for (int i = 0; i < 2; i++) {
+			glm::mat4 matrizSet = glm::mat4(1.0f);
+
+			// Posicionamos cada set en el eje X
+			matrizSet = glm::translate(matrizSet, glm::vec3(i * desplazamientoX, 0.0f, 0.0f));
+			lampara1.Draw(lightingShader, VAO, matrizSet);
+		}
+		
+		for (int i = 0; i < 2; i++) {
+			glm::mat4 matrizSet = glm::mat4(1.0f);
+			// Posicionamos cada set en el eje X
+			matrizSet = glm::translate(matrizSet, glm::vec3(i * -6.0f, 0.0f, desplazamientoZ));
+			lampara1.Draw(lightingShader, VAO, matrizSet);
+		}
+		
 		// Also draw the lamp object, again binding the appropriate shader
 		lampShader.Use();
 
@@ -635,13 +657,13 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode
 		AnimacionEnProgreso = false;
 	}
 
-	if (keys[GLFW_KEY_L] && !AnimacionMesaEnProgreso)
+	if (keys[GLFW_KEY_O] && !AnimacionMesaEnProgreso)
 	{
 		AnimMesa = !AnimMesa;        // Cambia el estado de animación
 		MesaAbierta = !MesaAbierta;   // Cambia el estado de la mesa
 		AnimacionMesaEnProgreso = true;
 	}
-	else if (!keys[GLFW_KEY_L])
+	else if (!keys[GLFW_KEY_O])
 	{
 		AnimacionMesaEnProgreso = false;
 	}
