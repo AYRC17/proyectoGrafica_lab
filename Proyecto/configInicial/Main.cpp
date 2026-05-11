@@ -32,6 +32,7 @@
 #include "stand.h"
 #include "persona.h"
 #include "Lampara.h"
+#include "Reja.h"
 // Function prototypes
 void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode);
 void MouseCallback(GLFWwindow *window, double xPos, double yPos);
@@ -113,8 +114,13 @@ float vertices[] = {
 glm::vec3 Light1 = glm::vec3(0);
 
 //declaracion de objetos
-Carro CarroAzul(glm::vec3(37.0f, 0.050f, 13.0f));
-bool AnimCarro = false;
+Carro carro(glm::vec3(37.0f, 0.050f, 11.0f));
+bool animCarro = false;
+int estadoCarro = 0; // 0: Recto, 1: Curva, 2: Posicionamiento final, 3: Detenido
+float velocidadCarro = 4.0f;
+float rLlantaVel = 300.0f; // Velocidad de rotación de las llantas
+bool alineadoX = false;
+bool alineadoZ = false;
 
 Tren TrenRojo(glm::vec3(-1.0f, 0.0f, -26.0f));
 bool AnimTren = false;
@@ -156,7 +162,7 @@ typedef struct _frame {
 FRAME KeyFrame[MAX_FRAMES];
 
 int playIndex = 0;       // Indica en qué frame vamos
-int i_max_steps = 180;    // Velocidad de interpolación (menor = más rápido el baile)
+int i_max_steps = 120;    // Velocidad de interpolación (menor = más rápido el baile)
 int i_curr_steps = 0;    // Contador de pasos actual
 
 // Variables de incremento para suavizar la animación
@@ -199,17 +205,24 @@ float incS_hDerX, incS_hDerY, incS_hDerZ, incS_cDer;
 float incS_cZ;
 
 Persona persona1(glm::vec3(6.8f, 0.13f, -1.1f));
-Persona personaCaminando(glm::vec3(14.0f, 0.13f, 1.0f));
+
+Persona personaCaminando(glm::vec3(12.f, 0.13f, 1.0f));
 bool animPersonaCaminando = false;
 int estadoCaminando = 0; // 0: Reposo, 1: Pierna Der. Adelante, 2: Pierna Izq. Adelante
 float velocidadCaminata = 80.0f; // Velocidad de rotación de las extremidades
 float limitePaso = 35.0f; // Ángulo máximo que pueden alcanzar las piernas
 
 Lampara lampara1(glm::vec3(17.0f, 3.85f, -5.67f));
-//Silla silla2(glm::vec3(0.0f, 0.050f, 0.3f));
-//Mesa mesa2(glm::vec3(0.0f, 0.74f, -0.5f));
-//Stand stand2(glm::vec3(0.0f, 0.03f, 0.0f));
 
+Silla silla2(glm::vec3(19.0f, 0.050f, -2.0f));
+Mesa mesa2(glm::vec3(19.0f, 0.74f, -1.4f));
+Stand stand2(glm::vec3(19.0f, 0.03f, -1.5f));
+
+Silla silla3(glm::vec3(11.5f, 0.050f, -5.0f));
+Mesa mesa3(glm::vec3(11.5f, 0.74f, -4.0f));
+Stand stand3(glm::vec3(11.5f, 0.03f, -4.2f));
+
+Reja rejaPuerta(glm::vec3(6.0f, 1.5f, -0.5f));
 // Deltatime
 GLfloat deltaTime = 0.0f;	// Time between current frame and last frame
 GLfloat lastFrame = 0.0f;  	// Time of last frame
@@ -257,21 +270,49 @@ int main()
 		return EXIT_FAILURE;
 	}
 	//inicializamos objetos
-	CarroAzul.Inicializar();
+	carro.Inicializar();
+	carro.rotacion = glm::vec3(0.0f, 180.0f, 0.0f);
+	carro.escala = glm::vec3(1.1f, 1.1f, 1.1f);
+	
 	TrenRojo.Inicializar();
+	TrenRojo.escala = glm::vec3(3.0f, 2.2f, 2.5f);
+
 	SillaPlegable.Inicializar();
+	SillaPlegable.rotacion = glm::vec3(0.0f, 180.0f, 0.0f);
+
 	MesaPlegable.Inicializar();
 	
 	stand1.Inicializar();
+	stand1.rotacion = glm::vec3(0.0f, 180.0f, 0.0f);
+	stand1.escala = glm::vec3(1.0f, 0.7f, 1.0f);
+	
 	persona1.Inicializar();
-	personaCaminando.Inicializar();
+	persona1.rotacion = glm::vec3(0.0f, 180.0f, 0.0f);
+	persona1.escala = glm::vec3(0.42f, 0.42f, 0.42f);
 
-	/*silla2.Inicializar();
+	personaCaminando.Inicializar();
+	personaCaminando.rotacion = glm::vec3(0.0f, 180.0f, 0.0f);
+	personaCaminando.escala = glm::vec3(0.42f, 0.42f, 0.42f);
+
+	silla2.Inicializar();
+	silla2.rotacion = glm::vec3(0.0f, 180.0f, 0.0f);
+	silla2.anguloPlegado = 165.0f;
 	mesa2.Inicializar();
-	stand2.Inicializar();*/
+	mesa2.anguloApertura = 180.0f;
+	stand2.Inicializar();
+
+	silla3.Inicializar();
+	silla3.rotacion = glm::vec3(0.0f, 180.0f, 0.0f);
+	silla3.anguloPlegado = 165.5f;
+	mesa3.Inicializar();
+	mesa3.anguloApertura = 180.0f;
+	stand3.Inicializar();
+
 	lampara1.Inicializar();
+	rejaPuerta.Inicializar();
 
 	botarga.Inicializar();
+	botarga.escala = glm::vec3(0.47f, 0.47f, 0.47f);
 	// GUARDADO DE KEYFRAMES rat dance
 	//Frame 0:
 	KeyFrame[0].posY = -0.2f;  // Rebote arriba
@@ -302,8 +343,8 @@ int main()
 	KeyFrame[3].hDerX = 10.0f; KeyFrame[3].hDerY = 50.0f; KeyFrame[3].hDerZ = 40.0f; KeyFrame[3].cDer = 90.0f; //Brazo derecho
 
 
-
 	botarga2.Inicializar();
+	botarga2.escala = glm::vec3(0.47f, 0.47f, 0.47f);
 	//GUARDADO DE KEYFRAMES DEL SCUBA CAT
 	//Frame 0: Paso a la Izquierda, Pata Izquierda arriba, Derecha baja, ligero agache
 	// Frame 0
@@ -465,70 +506,68 @@ int main()
 		
 
 		//Dibujar modelos 
-		CarroAzul.rotacion = glm::vec3(0.0f, 180.0f, 0.0f);
-		CarroAzul.escala = glm::vec3(1.1f, 1.1f, 1.1f);
-		CarroAzul.Draw(lightingShader, VAO);
 		
-		TrenRojo.escala = glm::vec3(3.0f,2.2f,2.5f);
+		
+		carro.Draw(lightingShader, VAO);
+		
 		TrenRojo.Draw(lightingShader, VAO);
 		
-		SillaPlegable.rotacion = glm::vec3(0.0f, 180.0f, 0.0f);
 		SillaPlegable.Draw(lightingShader, VAO);
 		
 		MesaPlegable.Draw(lightingShader, VAO);
 
-		botarga.escala = glm::vec3(0.47f, 0.47f, 0.47f);
 		botarga.Draw(lightingShader, VAO);
 		
-		stand1.rotacion = glm::vec3(0.0f, 180.0f, 0.0f);
-		stand1.escala = glm::vec3(1.0f, 0.7f, 1.0f);
 		stand1.Draw(lightingShader, VAO);
 		
-		persona1.rotacion = glm::vec3(0.0f, 180.0f, 0.0f);
-		persona1.escala = glm::vec3(0.42f, 0.42f, 0.42f);
 		persona1.Draw(lightingShader, VAO);
 
-		botarga2.escala = glm::vec3(0.47f, 0.47f, 0.47f);
 		botarga2.Draw(lightingShader, VAO);
 		
-		
+		rejaPuerta.Draw(lightingShader, VAO);
 
-		//float desplazamientoX = 5.0f; // Espacio entre cada set
-
-		//for (int i = 0; i < 4; i++) {
-		//	glm::mat4 matrizSet = glm::mat4(1.0f);
-
-		//	// Posicionamos cada set en el eje X
-		//	matrizSet = glm::translate(matrizSet, glm::vec3(i * desplazamientoX, 0.0f, -5.0f));
-
-		//	// Lógica para cambiar el tamaño
-		//	if (i >= 2) {
-		//		matrizSet = glm::scale(matrizSet, glm::vec3(0.6f, 0.7f, 0.6f));
-		//	}
-
-		//	// Dibujamos usando la matriz padre
-		//	stand2.Draw(lightingShader, VAO, matrizSet);
-		//	mesa2.Draw(lightingShader, VAO, matrizSet);
-		//	silla2.anguloPlegado = 180.0f;
-		//	silla2.Draw(lightingShader, VAO, matrizSet);
-		//}
-		personaCaminando.rotacion = glm::vec3(0.0f, 180.0f, 0.0f);
-		personaCaminando.escala = glm::vec3(0.42f, 0.42f, 0.42f);
 		personaCaminando.Draw(lightingShader, VAO);
 
+		// DIBUJANDO STANDS DE MUESTRA
+		float DesplazamientoX = 5.5f; // Espacio entre cada set
+		float DesplazamientoZ = -5.0f;
+		for (int i = 0; i < 5; i++) {
+			glm::mat4 matrizSet = glm::mat4(1.0f);
+
+			// Posicionamos cada set en el eje X
+			matrizSet = glm::translate(matrizSet, glm::vec3(i * DesplazamientoX, 0.0f, -19.0f));
+			matrizSet = glm::translate(matrizSet, glm::vec3(-13.2f,0.05f,0.05f));
+			// Dibujamos usando la matriz padre
+			stand2.Draw(lightingShader, VAO, matrizSet);
+			mesa2.Draw(lightingShader, VAO, matrizSet);
+			silla2.Draw(lightingShader, VAO, matrizSet);
+		}
+		for (int i = 0; i < 3; i++) {
+			glm::mat4 matrizSet = glm::mat4(1.0f);
+			// Posicionamos cada set en el eje z
+			matrizSet = glm::translate(matrizSet, glm::vec3(18.0f, 0.05f, i * DesplazamientoZ));
+			matrizSet = glm::translate(matrizSet, glm::vec3(0.05f, 0.2f, -12.0f));
+			matrizSet = glm::rotate(matrizSet, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+			matrizSet = glm::scale(matrizSet, glm::vec3(0.8f, 0.7f, 0.8f));
+			stand3.Draw(lightingShader, VAO, matrizSet);
+			mesa3.Draw(lightingShader, VAO, matrizSet);
+			silla3.Draw(lightingShader, VAO, matrizSet);
+		}
+
+		
 		float desplazamientoX = -6.0f; // Espacio entre cada lampara
 		float desplazamientoZ = -9.0f;
 		for (int i = 0; i < 2; i++) {
 			glm::mat4 matrizSet = glm::mat4(1.0f);
 
-			// Posicionamos cada set en el eje X
+			// Posicionamos cada lampara en el eje X
 			matrizSet = glm::translate(matrizSet, glm::vec3(i * desplazamientoX, 0.0f, 0.0f));
 			lampara1.Draw(lightingShader, VAO, matrizSet);
 		}
 		
 		for (int i = 0; i < 2; i++) {
 			glm::mat4 matrizSet = glm::mat4(1.0f);
-			// Posicionamos cada set en el eje X
+			// Posicionamos cada lampara en el eje z
 			matrizSet = glm::translate(matrizSet, glm::vec3(i * -6.0f, 0.0f, desplazamientoZ));
 			lampara1.Draw(lightingShader, VAO, matrizSet);
 		}
@@ -641,18 +680,23 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode
 		}
 	}
 	
-	if (keys[GLFW_KEY_M])
-	{
-		AnimCarro = !AnimCarro;
+	if (key == GLFW_KEY_V && action == GLFW_PRESS) {
+		animCarro = !animCarro;
+		if (animCarro) {
+			estadoCarro = 0;
+			// Reiniciamos las coordenadas base para que repita la animación correctamente
+			carro.posicion = glm::vec3(37.0f, 0.050f, 11.0f);
+			carro.rotacion.y = 180.0f;
+		}
 	}
 
-	if (keys[GLFW_KEY_O] && !AnimacionEnProgreso)
+	if (keys[GLFW_KEY_P] && !AnimacionEnProgreso)
 	{
 		AnimSilla = !AnimSilla;// Alterna entre abrir y cerrar
 		SillaAbierta = !SillaAbierta;
 		AnimacionEnProgreso = true;
 	}
-	else if (!keys[GLFW_KEY_O])
+	else if (!keys[GLFW_KEY_P])
 	{
 		AnimacionEnProgreso = false;
 	}
@@ -679,12 +723,92 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode
 }
 void Animation() {
 	
-	if (AnimCarro)
-	{
-		// Las llantas rotan sobre su propio eje
-		CarroAzul.rotacionLlantas -= 100.0f * deltaTime;
-		// El carro avanza sobre el eje X
-		CarroAzul.avance += 2.0f * deltaTime;
+	if (animCarro) {
+		//Lógica de rotación de llantas diferenciada por estado
+		if (estadoCarro == 0) {
+			carro.rotacionLlantas -= rLlantaVel * deltaTime; // Adelante
+		}
+		else if (estadoCarro == 1 || estadoCarro == 2) {
+			carro.rotacionLlantas += rLlantaVel * deltaTime; // Reversa normal
+		}
+		else if (estadoCarro == 3) {
+			carro.rotacionLlantas += (rLlantaVel * 0.2f) * deltaTime; // Reversa lenta de acomodo
+		}
+
+		//Máquina de Estados del Trayecto
+		switch (estadoCarro) {
+		case 0: // AVANCE RECTO 
+			carro.posicion.x -= velocidadCarro * deltaTime;
+			carro.giroVolante = 0.0f;
+
+			// Avanzamos hasta 17.3 para que el trayecto diagonal coincida exactamente con Pikachu
+			if (carro.posicion.x <= 17.3f) {
+				estadoCarro = 1;
+			}
+			break;
+
+		case 1: // REVERSA QUEBRANDO (Trompa a +Z, Cola a -Z)
+			carro.posicion.x += (velocidadCarro * 0.4f) * deltaTime;
+			carro.posicion.z -= (velocidadCarro * 1.05f) * deltaTime;
+
+			carro.giroVolante = 35.0f; // Volante a la izquierda
+			carro.rotacion.y += 45.0f * deltaTime; 
+
+			// Llegamos a los 225 grados (45° de inclinación)
+			if (carro.rotacion.y >= 225.0f) {
+				carro.rotacion.y = 225.0f;
+				estadoCarro = 2;
+			}
+			break;
+
+		case 2: // REVERSA EN DIAGONAL (Mantiene el ángulo de 225°)
+			// Nos movemos en línea recta hacia atrás, igualando la proporción en X y Z
+			carro.posicion.x += (velocidadCarro * 0.5f) * deltaTime;
+			carro.posicion.z -= (velocidadCarro * 0.5f) * deltaTime;
+
+			carro.giroVolante = 0.0f; // Llantas rectas
+			// Nos detenemos cerca del cajón
+			if (carro.posicion.z <= 4.9f) {
+				estadoCarro = 3;
+			}
+			break;
+
+		case 3: // ACOMODO A (23, 0.05, 4.7)
+			carro.giroVolante = 0.0f;
+
+			if (carro.posicion.x < 22.9f) {
+				carro.posicion.x += (velocidadCarro * 0.2f) * deltaTime;
+			}
+			else if (carro.posicion.x > 23.1f) {
+				carro.posicion.x -= (velocidadCarro * 0.2f) * deltaTime;
+			}
+			else {
+				carro.posicion.x = 23.0f;
+				alineadoX = true;
+			}
+
+			//Objetivo 4.7f
+			if (carro.posicion.z > 4.8f) { // Tolerancia superior
+				carro.posicion.z -= (velocidadCarro * 0.2f) * deltaTime;
+			}
+			else if (carro.posicion.z < 4.6f) { // Tolerancia inferior
+				carro.posicion.z += (velocidadCarro * 0.2f) * deltaTime;
+			}
+			else {
+				carro.posicion.z = 4.7f; // Valor final exacto
+				alineadoZ = true;
+			}
+
+			if (alineadoX && alineadoZ) {
+				estadoCarro = 4;
+			}
+			break;
+
+		case 4: // DETENIDO
+			carro.giroVolante = 0.0f;
+			animCarro = false;
+			break;
+		}
 	}
 	if (AnimMesa) {
 		// Abrir mesa (0° a 180°)
@@ -753,7 +877,7 @@ void Animation() {
 		//DESPLAZAMIENTO
 		personaCaminando.posicion.z -= 1.5f * deltaTime;
 			
-		if (personaCaminando.posicion.z <= -10.0f) { //limite final
+		if (personaCaminando.posicion.z <= -18.0f) { //limite final
 			animPersonaCaminando = false;
 				
 		}

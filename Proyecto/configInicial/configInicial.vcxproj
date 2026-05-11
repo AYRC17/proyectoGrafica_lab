@@ -145,6 +145,7 @@
     <ClInclude Include="Mesa.h" />
     <ClInclude Include="persona.h" />
     <ClInclude Include="pikachu.h" />
+    <ClInclude Include="Reja.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="silla.h" />
     <ClInclude Include="stand.h" />
@@ -165,6 +166,7 @@
     <ClCompile Include="Mesa.cpp" />
     <ClCompile Include="persona.cpp" />
     <ClCompile Include="pikachu.cpp" />
+    <ClCompile Include="Reja.cpp" />
     <ClCompile Include="silla.cpp" />
     <ClCompile Include="stand.cpp" />
     <ClCompile Include="tren.cpp" />
