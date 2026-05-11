@@ -53,6 +53,8 @@ void Silla::Inicializar() {
 void Silla::Draw(Shader& shader, GLuint VAO, glm::mat4 matrizPadre) {
     GLint modelLoc = glGetUniformLocation(shader.Program, "model");
     GLint matDiffLoc = glGetUniformLocation(shader.Program, "material.diffuse");
+    GLuint shininessLoc = glGetUniformLocation(shader.Program, "material.shininess");
+    if (shininessLoc != -1) glUniform1f(shininessLoc, 32.0f);
 
     glBindVertexArray(VAO);
     glDisable(GL_BLEND);
@@ -72,14 +74,14 @@ void Silla::Draw(Shader& shader, GLuint VAO, glm::mat4 matrizPadre) {
 
     // Pata Delantera Izquierda
     glm::mat4 pataDI = glm::translate(modelSilla, glm::vec3(-0.2f, 0.5f, 0.1f));
-   // pataDI = glm::rotate(pataDI, glm::radians(anguloPatasDelanteras), glm::vec3(1.0f, 0.0f, 0.0f));
+   
     pataDI = glm::scale(pataDI, glm::vec3(0.03f, 1.0f, 0.03f));
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(pataDI));
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
     // Pata Delantera Derecha
     glm::mat4 pataDD = glm::translate(modelSilla, glm::vec3(0.2f, 0.5f, 0.1f));
-    //pataDD = glm::rotate(pataDD, glm::radians(anguloPatasDelanteras), glm::vec3(1.0f, 0.0f, 0.0f));
+   
     pataDD = glm::scale(pataDD, glm::vec3(0.03f, 1.0f, 0.03f));
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(pataDD));
     glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -88,7 +90,7 @@ void Silla::Draw(Shader& shader, GLuint VAO, glm::mat4 matrizPadre) {
    
     // Respaldo (Fijo a las patas delanteras)
     glm::mat4 respaldo = glm::translate(modelSilla, glm::vec3(0.0f, 0.85f, 0.1f));
-    //respaldo = glm::rotate(respaldo, glm::radians(anguloPatasDelanteras), glm::vec3(1.0f, 0.0f, 0.0f));
+    
     respaldo = glm::scale(respaldo, glm::vec3(0.38f, 0.15f, 0.02f));
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(respaldo));
     glDrawArrays(GL_TRIANGLES, 0, 36);

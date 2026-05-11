@@ -133,6 +133,8 @@ void Tren::Inicializar() {
 void Tren::Draw(Shader& shader, GLuint VAO) {
     GLint modelLoc = glGetUniformLocation(shader.Program, "model");
     GLint matDiffLoc = glGetUniformLocation(shader.Program, "material.diffuse");
+    GLuint shininessLoc = glGetUniformLocation(shader.Program, "material.shininess");
+    if (shininessLoc != -1) glUniform1f(shininessLoc, 128.0f);
 
     glBindVertexArray(VAO);
     glDisable(GL_BLEND);

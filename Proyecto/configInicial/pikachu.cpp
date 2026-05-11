@@ -83,7 +83,10 @@ void Pikachu::Inicializar() {
 void Pikachu::Draw(Shader& shader, GLuint VAO) {
     GLint modelLoc = glGetUniformLocation(shader.Program, "model");
     GLint matDiffLoc = glGetUniformLocation(shader.Program, "material.diffuse");
+    GLuint shininessLoc = glGetUniformLocation(shader.Program, "material.shininess");
 
+    // Le asignamos un brillo alto (32.0f) para que parezca plástico o nylon
+    if (shininessLoc != -1) glUniform1f(shininessLoc, 32.0f);
     glBindVertexArray(VAO);
     glDisable(GL_BLEND);
     glActiveTexture(GL_TEXTURE0);

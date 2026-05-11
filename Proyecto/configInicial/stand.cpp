@@ -54,7 +54,8 @@ void Stand::Inicializar() {
 void Stand::Draw(Shader& shader, GLuint VAO, glm::mat4 matrizPadre) {
     GLint modelLoc = glGetUniformLocation(shader.Program, "model");
     GLint matDiffLoc = glGetUniformLocation(shader.Program, "material.diffuse");
-
+    GLuint shininessLoc = glGetUniformLocation(shader.Program, "material.shininess");
+    if (shininessLoc != -1) glUniform1f(shininessLoc, 32.0f);
     glBindVertexArray(VAO);
     glDisable(GL_BLEND);
     glActiveTexture(GL_TEXTURE0);

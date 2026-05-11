@@ -49,7 +49,9 @@ void Mesa::Inicializar() {
 void Mesa::Draw(Shader& shader, GLuint VAO, glm::mat4 matrizPadre) {
     GLint modelLoc = glGetUniformLocation(shader.Program, "model");
     GLint matDiffLoc = glGetUniformLocation(shader.Program, "material.diffuse");
-
+    GLint matSpecLoc = glGetUniformLocation(shader.Program, "material.specular");
+    GLuint shininessLoc = glGetUniformLocation(shader.Program, "material.shininess");
+    if (shininessLoc != -1) glUniform1f(shininessLoc, 32.0f);
     glBindVertexArray(VAO);
     glActiveTexture(GL_TEXTURE0);
     glUniform1i(matDiffLoc, 0);

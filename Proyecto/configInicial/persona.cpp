@@ -43,7 +43,9 @@ void Persona::Inicializar() {
 void Persona::Draw(Shader& shader, GLuint VAO) {
     GLint modelLoc = glGetUniformLocation(shader.Program, "model");
     GLint matDiffLoc = glGetUniformLocation(shader.Program, "material.diffuse");
-
+    GLuint shininessLoc = glGetUniformLocation(shader.Program, "material.shininess");
+    // Le asignamos un brillo muy bajo (4.0f) para que la luz sea difusa
+    if (shininessLoc != -1) glUniform1f(shininessLoc, 4.0f);
     glBindVertexArray(VAO);
     glDisable(GL_BLEND);
     glActiveTexture(GL_TEXTURE0);

@@ -13,7 +13,7 @@ public:
     // Variable para la animación de deslizamiento
     float desplazamientoX;
 
-    // Textura de la imagen rejas.png
+    // Textura de la imagen
     GLuint texturaBarrotes;
 
     Reja(glm::vec3 posInicial);
