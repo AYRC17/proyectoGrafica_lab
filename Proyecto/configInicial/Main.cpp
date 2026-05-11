@@ -56,16 +56,16 @@ bool active;
 // Positions of the point lights
 glm::vec3 pointLightPositions[] = {
 		//fila 1 horizontal
-		glm::vec3(7.0f,  2.9f, -5.7f),  // lampara1
-		glm::vec3(7.0f,  2.9f, -10.7f), // lampara2
-		glm::vec3(7.0f, 2.9f, -18.4f),  // lampara3
+		glm::vec3(7.0f,  2.7f, -5.7f),  // lampara1
+		glm::vec3(7.0f,  2.7f, -10.7f), // lampara2
+		glm::vec3(7.0f, 2.7f, -18.4f),  // lampara3
 		//fila2 horizontal
-		glm::vec3(12.0f, 2.9f, -5.7f), // lampara4
-		glm::vec3(12.0f, 2.9f, -10.7f),  // lampara5
-		glm::vec3(12.0f, 2.9f, -18.4f),  // lampara6
+		glm::vec3(12.0f, 2.7f, -5.7f), // lampara4
+		glm::vec3(12.0f, 2.7f, -10.7f),  // lampara5
+		glm::vec3(12.0f, 2.7f, -18.4f),  // lampara6
 		//fila3 muestra horizontal
-		glm::vec3(17.0f, 2.9f, -5.7f),// lampara 7
-		glm::vec3(17.0f, 2.9f, -14.7f)//lampara 9
+		glm::vec3(17.0f, 2.7f, -5.7f),// lampara 7
+		glm::vec3(17.0f, 2.7f, -14.7f)//lampara 9
 };
 
 
@@ -169,7 +169,7 @@ typedef struct _frame {
 FRAME KeyFrame[MAX_FRAMES];
 
 int playIndex = 0;       // Indica en qué frame vamos
-int i_max_steps = 120;    // Velocidad de interpolación (menor = más rápido el baile)
+int i_max_steps = 60;    // Velocidad de interpolación (menor = más rápido el baile)
 int i_curr_steps = 0;    // Contador de pasos actual
 
 // Variables de incremento para suavizar la animación
@@ -202,7 +202,7 @@ typedef struct _frameScuba {
 FRAME_SCUBA KeyFrameScuba[MAX_FRAMES_SCUBA];
 
 int playIndexScuba = 0;
-int i_max_stepsScuba = 120; 
+int i_max_stepsScuba = 50; 
 int i_curr_stepsScuba = 0;
 
 // Incrementos para la interpolación de botarga2
@@ -471,16 +471,15 @@ int main()
 
 
 		// Directional light
-		// Le damos una dirección ligera
+		//Inclinada para simular que el sol va subiendo (Sombras laterales)
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.direction"), -0.5f, -0.7f, -0.3f);
 
-		// AMBIENTAL: Esta es la base de tu escenario. 
-		// Valores como 0.3f a 0.4f dan una iluminación base clara pero tenue, ideal para interiores.
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.ambient"), 0.4f, 0.4f, 0.35f);
+		//Luz de tono suave
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.ambient"), 0.55f, 0.55f, 0.45f);
 
-		// Reducimos el difuso y especular casi a cero para que esta luz no genere brillos plásticos.
-		// Queremos que los brillos los generen tus lámparas puntuales más adelante.
+		// El color de la luz solar (Blanco-Amarillento)
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.diffuse"), 1.0f, 0.9f, 0.7f);
+		// Reflejo del sol en superficies brillantes
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.specular"), 0.5f, 0.5f, 0.4f);
 
 
@@ -495,15 +494,15 @@ int main()
 
 			glUniform3f(glGetUniformLocation(lightingShader.Program, ("pointLights[" + number + "].position").c_str()), pointLightPositions[i].x, pointLightPositions[i].y, pointLightPositions[i].z);
 
-			// Mantenemos los mismos colores e intensidades de la clase
-			glUniform3f(glGetUniformLocation(lightingShader.Program, ("pointLights[" + number + "].ambient").c_str()), 0.05f, 0.05f, 0.05f);
-			glUniform3f(glGetUniformLocation(lightingShader.Program, ("pointLights[" + number + "].diffuse").c_str()), 0.8f, 0.8f, 0.7f);
-			glUniform3f(glGetUniformLocation(lightingShader.Program, ("pointLights[" + number + "].specular").c_str()), 1.0f, 1.0f, 1.0f);
+			// Mantenemos los mismos colores e intensidades 
+			glUniform3f(glGetUniformLocation(lightingShader.Program, ("pointLights[" + number + "].ambient").c_str()), 0.016f, 0.012f, 0.016f);
+			glUniform3f(glGetUniformLocation(lightingShader.Program, ("pointLights[" + number + "].diffuse").c_str()), 0.35f, 0.35f, 0.35f);
+			glUniform3f(glGetUniformLocation(lightingShader.Program, ("pointLights[" + number + "].specular").c_str()), 0.5f, 0.5f, 0.5f);
 
-			// Atenuación estándar vista en el curso
+			// Atenuación estándar
 			glUniform1f(glGetUniformLocation(lightingShader.Program, ("pointLights[" + number + "].constant").c_str()), 1.0f);
-			glUniform1f(glGetUniformLocation(lightingShader.Program, ("pointLights[" + number + "].linear").c_str()), 0.09f);
-			glUniform1f(glGetUniformLocation(lightingShader.Program, ("pointLights[" + number + "].quadratic").c_str()), 0.032f);
+			glUniform1f(glGetUniformLocation(lightingShader.Program, ("pointLights[" + number + "].linear").c_str()), 0.013f);
+			glUniform1f(glGetUniformLocation(lightingShader.Program, ("pointLights[" + number + "].quadratic").c_str()), 0.092f);
 		}
 
 
@@ -536,15 +535,16 @@ int main()
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
-
-		glm::mat4 model(1);
-		
 		//Carga de modelo 
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glm::mat4 model(1);
         view = camera.GetViewMatrix();	
 		model = glm::mat4(1);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		Sotano.Draw(lightingShader);
-		
+		glDisable(GL_BLEND);
 
 		//Dibujar modelos 
 		
