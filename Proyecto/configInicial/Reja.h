@@ -9,7 +9,6 @@ class Reja{
 public:
     glm::vec3 posicion;
     glm::vec3 escala;
-    glm::vec3 rotacion;
 
     // Variable para la animación de deslizamiento
     float desplazamientoX;

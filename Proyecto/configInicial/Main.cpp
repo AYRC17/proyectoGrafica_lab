@@ -212,6 +212,13 @@ int estadoCaminando = 0; // 0: Reposo, 1: Pierna Der. Adelante, 2: Pierna Izq. A
 float velocidadCaminata = 80.0f; // Velocidad de rotación de las extremidades
 float limitePaso = 35.0f; // Ángulo máximo que pueden alcanzar las piernas
 
+Persona persona2(glm::vec3(28.0f, 0.13f, -18.1f));
+bool animPersona2Caminando = false;
+int estadoCaminando2 = 0; // 0: Reposo, 1: Pierna Der. Adelante, 2: Pierna Izq. Adelante
+float velocidadCaminata2 = 80.0f; // Velocidad de rotación de las extremidades
+float limitePaso2 = 35.0f; // Ángulo máximo que pueden alcanzar las piernas
+int fasePersona2 = 0;
+
 Lampara lampara1(glm::vec3(17.0f, 3.85f, -5.67f));
 
 Silla silla2(glm::vec3(19.0f, 0.050f, -2.0f));
@@ -222,7 +229,15 @@ Silla silla3(glm::vec3(11.5f, 0.050f, -5.0f));
 Mesa mesa3(glm::vec3(11.5f, 0.74f, -4.0f));
 Stand stand3(glm::vec3(11.5f, 0.03f, -4.2f));
 
-Reja rejaPuerta(glm::vec3(6.0f, 1.5f, -0.5f));
+Reja rejaPuertaIzq(glm::vec3(6.5f, 1.0f, -0.02f));
+Reja rejaPuertaDer(glm::vec3(22.5f, 1.0f, -0.02f));
+bool AnimRejas = false;           // Estado de animación de la reja
+bool RejasAbiertas = true;       // Estado actual (abierta/cerrada)
+bool AnimacionRejasEnProgreso = false; // Para evitar el rebote del teclado
+float velocidadReja = 2.0f;       // Qué tan rápido se deslizan
+bool p1_llego = false;
+bool p2_llego = false;
+
 // Deltatime
 GLfloat deltaTime = 0.0f;	// Time between current frame and last frame
 GLfloat lastFrame = 0.0f;  	// Time of last frame
@@ -294,6 +309,10 @@ int main()
 	personaCaminando.rotacion = glm::vec3(0.0f, 180.0f, 0.0f);
 	personaCaminando.escala = glm::vec3(0.42f, 0.42f, 0.42f);
 
+	persona2.Inicializar();
+	persona2.rotacion = glm::vec3(0.0f, -180.0f, 0.0f);
+	persona2.escala = glm::vec3(0.42f, 0.42f, 0.42f);
+	
 	silla2.Inicializar();
 	silla2.rotacion = glm::vec3(0.0f, 180.0f, 0.0f);
 	silla2.anguloPlegado = 165.0f;
@@ -309,7 +328,8 @@ int main()
 	stand3.Inicializar();
 
 	lampara1.Inicializar();
-	rejaPuerta.Inicializar();
+	rejaPuertaIzq.Inicializar();
+	rejaPuertaDer.Inicializar();
 
 	botarga.Inicializar();
 	botarga.escala = glm::vec3(0.47f, 0.47f, 0.47f);
@@ -524,9 +544,13 @@ int main()
 
 		botarga2.Draw(lightingShader, VAO);
 		
-		rejaPuerta.Draw(lightingShader, VAO);
+		rejaPuertaIzq.Draw(lightingShader, VAO);
+		
+	    rejaPuertaDer.Draw(lightingShader, VAO);
 
 		personaCaminando.Draw(lightingShader, VAO);
+
+		persona2.Draw(lightingShader, VAO);
 
 		// DIBUJANDO STANDS DE MUESTRA
 		float DesplazamientoX = 5.5f; // Espacio entre cada set
@@ -690,13 +714,13 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode
 		}
 	}
 
-	if (keys[GLFW_KEY_P] && !AnimacionEnProgreso)
+	if (keys[GLFW_KEY_L] && !AnimacionEnProgreso)
 	{
 		AnimSilla = !AnimSilla;// Alterna entre abrir y cerrar
 		SillaAbierta = !SillaAbierta;
 		AnimacionEnProgreso = true;
 	}
-	else if (!keys[GLFW_KEY_P])
+	else if (!keys[GLFW_KEY_L])
 	{
 		AnimacionEnProgreso = false;
 	}
@@ -720,9 +744,27 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode
 	if (key == GLFW_KEY_B && action == GLFW_PRESS) {
 		animScubaCat = !animScubaCat;
 	}
+	if (keys[GLFW_KEY_P] && !AnimacionRejasEnProgreso)
+	{
+		AnimRejas = !AnimRejas;             // Alterna el estado de animación
+		RejasAbiertas = !RejasAbiertas;     // Alterna el estado físico
+		AnimacionRejasEnProgreso = true;    // Bloquea múltiples lecturas
+	}
+	else if (!keys[GLFW_KEY_P])
+	{
+		AnimacionRejasEnProgreso = false;   // Libera el botón al soltarlo
+	}
+	if (key == GLFW_KEY_X && action == GLFW_PRESS) {
+		animPersona2Caminando = !animPersona2Caminando;
+		if (animPersona2Caminando) {
+			estadoCaminando2 = 0; // Reiniciar desde el primer estado
+			persona2.posicion = glm::vec3(28.0f, 0.13f, -18.1f); // Reset de posición
+		}
+	}
+
 }
 void Animation() {
-	
+
 	if (animCarro) {
 		//Lógica de rotación de llantas diferenciada por estado
 		if (estadoCarro == 0) {
@@ -742,7 +784,7 @@ void Animation() {
 			carro.giroVolante = 0.0f;
 
 			// Avanzamos hasta 17.3 para que el trayecto diagonal coincida exactamente con Pikachu
-			if (carro.posicion.x <= 17.3f) {
+			if (carro.posicion.x <= 18.3f) {
 				estadoCarro = 1;
 			}
 			break;
@@ -752,7 +794,7 @@ void Animation() {
 			carro.posicion.z -= (velocidadCarro * 1.05f) * deltaTime;
 
 			carro.giroVolante = 35.0f; // Volante a la izquierda
-			carro.rotacion.y += 45.0f * deltaTime; 
+			carro.rotacion.y += 45.0f * deltaTime;
 
 			// Llegamos a los 225 grados (45° de inclinación)
 			if (carro.rotacion.y >= 225.0f) {
@@ -773,17 +815,17 @@ void Animation() {
 			}
 			break;
 
-		case 3: // ACOMODO A (23, 0.05, 4.7)
+		case 3: // ACOMODO A (22, 0.05, 4.7)
 			carro.giroVolante = 0.0f;
 
-			if (carro.posicion.x < 22.9f) {
+			if (carro.posicion.x < 21.9f) {
 				carro.posicion.x += (velocidadCarro * 0.2f) * deltaTime;
 			}
-			else if (carro.posicion.x > 23.1f) {
+			else if (carro.posicion.x > 22.1f) {
 				carro.posicion.x -= (velocidadCarro * 0.2f) * deltaTime;
 			}
 			else {
-				carro.posicion.x = 23.0f;
+				carro.posicion.x = 22.0f;
 				alineadoX = true;
 			}
 
@@ -838,6 +880,7 @@ void Animation() {
 			AnimSilla = false;
 		}
 	}
+
 	//CAMINATA
 	if (animPersonaCaminando) {
 		// Si acaba de iniciar, pasamos del estado de reposo (0) al primer movimiento (1)
@@ -876,13 +919,13 @@ void Animation() {
 
 		//DESPLAZAMIENTO
 		personaCaminando.posicion.z -= 1.5f * deltaTime;
-			
+
 		if (personaCaminando.posicion.z <= -18.0f) { //limite final
 			animPersonaCaminando = false;
-				
+
 		}
 		// Flexionar ligeramente las rodillas/codos mientras camina 
-		personaCaminando.rotRodillaDer = 15.0f; 
+		personaCaminando.rotRodillaDer = 15.0f;
 		personaCaminando.rotRodillaIzq = 15.0f;
 		personaCaminando.rotCodoDer = -15.0f;
 		personaCaminando.rotCodoIzq = -15.0f;
@@ -1022,7 +1065,180 @@ void Animation() {
 		botarga2.rotHombroDerX = 0.0f; botarga2.rotHombroDerY = 0.0f; botarga2.rotHombroDerZ = -60.0f;
 		botarga2.rotCodoDer = 0.0f;
 	}
+	//ANIMACIÓN REJAS
+	if (AnimRejas) {
+		if (!RejasAbiertas) {
+			if (rejaPuertaIzq.desplazamientoX < 5.0f) {
+				rejaPuertaIzq.desplazamientoX += velocidadReja * deltaTime;
+			}
+			else {
+				rejaPuertaIzq.desplazamientoX = 5.0f; // Tope exacto
+				p1_llego = true;
+			}
 
+			// Reja Derecha: resta 5 unidades en -X
+			if (rejaPuertaDer.desplazamientoX > -5.0f) {
+				rejaPuertaDer.desplazamientoX -= velocidadReja * deltaTime;
+			}
+			else {
+				rejaPuertaDer.desplazamientoX = -5.0f; // Tope exacto
+				p2_llego = true;
+			}
+		}
+
+		else {
+
+			// Reja Izquierda: resta en X para volver a 0
+			if (rejaPuertaIzq.desplazamientoX > 0.0f) {
+				rejaPuertaIzq.desplazamientoX -= velocidadReja * deltaTime;
+			}
+			else {
+				rejaPuertaIzq.desplazamientoX = 0.0f;
+				p1_llego = true;
+			}
+
+			// Reja Derecha: suma en X para volver a 0
+			if (rejaPuertaDer.desplazamientoX < 0.0f) {
+				rejaPuertaDer.desplazamientoX += velocidadReja * deltaTime;
+			}
+			else {
+				rejaPuertaDer.desplazamientoX = 0.0f;
+				p2_llego = true;
+			}
+
+		}
+
+		// Condición Maestra de Paro (Aplica tanto para abrir como para cerrar)
+		if (p1_llego && p2_llego) {
+			AnimRejas = false; // Apagamos el motor de animación
+
+			// Reiniciamos los flags para que estén limpios la próxima vez que presiones 'P'
+			p1_llego = false;
+			p2_llego = false;
+
+		}
+	}
+	//CAMINATA CON GIROS Y SALUDO
+	if (animPersona2Caminando) {
+		static bool pasoDerecho = true;
+		static bool codoSube = true;; // Movimiento rítmico de caminata
+		static float tiempoSaludo = 0.0f;
+		// Aplicamos la flexión solo durante la caminata y los giros(Estados 0 al 3)
+		if (estadoCaminando2 < 4) {
+			persona2.rotRodillaDer = 15.0f;
+			persona2.rotRodillaIzq = 15.0f;
+			persona2.rotCodoDer = -15.0f;
+			persona2.rotCodoIzq = -15.0f;
+			
+		}
+		switch (estadoCaminando2) {
+		case 0: // GIRAR PARA MIRAR AL EJE X POSITIVO
+			persona2.rotacion.y += 100.0f * deltaTime;
+			if (persona2.rotacion.y >= -90.0f) { // Apunta a +X
+				persona2.rotacion.y = -90.0f;
+				estadoCaminando2 = 1;
+			}
+			break;
+
+		case 1: // CAMINAR HACIA X = 14
+			persona2.posicion.x -= 2.5f * deltaTime; // Restamos para avanzar a 14
+
+			// Animación de extremidades
+			if (pasoDerecho) {
+				persona2.rotPiernaDerX += velocidadCaminata2 * deltaTime;
+				persona2.rotPiernaIzqX -= velocidadCaminata2 * deltaTime;
+				persona2.rotHombroDerX -= velocidadCaminata2 * deltaTime;
+				persona2.rotHombroIzqX += velocidadCaminata2 * deltaTime;
+				if (persona2.rotPiernaDerX >= limitePaso2) pasoDerecho = false; // Invertir
+			}
+			else {
+				persona2.rotPiernaDerX -= velocidadCaminata2 * deltaTime;
+				persona2.rotPiernaIzqX += velocidadCaminata2 * deltaTime;
+				persona2.rotHombroDerX += velocidadCaminata2 * deltaTime;
+				persona2.rotHombroIzqX -= velocidadCaminata2 * deltaTime;
+				if (persona2.rotPiernaDerX <= -limitePaso2) pasoDerecho = true; // Invertir
+			}
+			if (persona2.posicion.x <= 14.0f) {
+				persona2.posicion.x = 14.0f;
+				estadoCaminando2 = 2;
+			}
+			break;
+
+		case 2: // ROTAR 90 GRADOS HACIA EJE Z POSITIVO
+			persona2.rotacion.y += 100.0f * deltaTime;
+			if (persona2.rotacion.y >= 0.0f) { // Mira hacia +Z
+				persona2.rotacion.y = 0.0f;
+				estadoCaminando2 = 3;
+			}
+			break;
+
+		case 3: // CAMINAR HACIA Z = 1
+			persona2.posicion.z += 2.5f * deltaTime; // Sumamos en Z
+
+			if (pasoDerecho) {
+				persona2.rotPiernaDerX += velocidadCaminata2 * deltaTime;
+				persona2.rotPiernaIzqX -= velocidadCaminata2 * deltaTime;
+				persona2.rotHombroDerX -= velocidadCaminata2 * deltaTime;
+				persona2.rotHombroIzqX += velocidadCaminata2 * deltaTime;
+				if (persona2.rotPiernaDerX >= limitePaso2) pasoDerecho = false;
+			}
+			else {
+				persona2.rotPiernaDerX -= velocidadCaminata2 * deltaTime;
+				persona2.rotPiernaIzqX += velocidadCaminata2 * deltaTime;
+				persona2.rotHombroDerX += velocidadCaminata2 * deltaTime;
+				persona2.rotHombroIzqX -= velocidadCaminata2 * deltaTime;
+				if (persona2.rotPiernaDerX <= -limitePaso2) pasoDerecho = true;
+			}
+
+			if (persona2.posicion.z >= 1.0f) {
+				persona2.posicion.z = 1.0f;
+				estadoCaminando2 = 4;
+				// Reset de extremidades a posición neutral para el saludo
+				persona2.rotPiernaDerX = 0; persona2.rotPiernaIzqX = 0;
+				persona2.rotHombroDerX = 0; persona2.rotHombroIzqX = 0;
+				tiempoSaludo = 0.0f;
+			}
+			break;
+
+		case 4: // SALUDO CON BRAZO IZQUIERDO
+			persona2.rotHombroIzqZ = 240.0f; // Levanta el brazo
+			// Movimiento de saludo
+			if (codoSube) {
+				persona2.rotCodoIzq += 120.0f * deltaTime; // 120 es la velocidad del saludo
+				if (persona2.rotCodoIzq >= 30.0f) codoSube = false; // Tope superior
+			}
+			else {
+				persona2.rotCodoIzq -= 120.0f * deltaTime;
+				if (persona2.rotCodoIzq <= -30.0f) codoSube = true; // Tope inferior
+			}
+			tiempoSaludo += deltaTime;
+			// Terminar saludo después de unos segundos 
+			if (tiempoSaludo > 3.0f) { // Ajustar según tiempo deseado
+				estadoCaminando2 = 5;
+			}
+			break;
+
+		case 5: // FINALIZAR Y REPOSO
+			persona2.rotHombroIzqZ = 0.0f;
+			persona2.rotCodoIzq = 0.0f;
+			animPersona2Caminando = false;
+			break;
+		}
+	}
+	else {
+		// Cuando se desactiva la animación, mandamos un cero en todas sus componentes (reposo)
+		estadoCaminando2 = 0;
+		persona2.rotPiernaDerX = 0.0f;
+		persona2.rotPiernaIzqX = 0.0f;
+		persona2.rotHombroDerX = 0.0f;
+		persona2.rotHombroIzqX = 0.0f;
+		persona2.rotHombroIzqZ = 0.0f; // Reseteamos también el levantamiento del brazo del saludo
+
+		persona2.rotRodillaDer = 0.0f;
+		persona2.rotRodillaIzq = 0.0f;
+		persona2.rotCodoDer = 0.0f;
+		persona2.rotCodoIzq = 0.0f;
+	}
 }
 
 void MouseCallback(GLFWwindow *window, double xPos, double yPos)

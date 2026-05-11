@@ -4,8 +4,8 @@
 
 Reja::Reja(glm::vec3 posInicial) {
     posicion = posInicial;
-    escala = glm::vec3(6.0f, 5.0f, 1.0f);
-    rotacion = glm::vec3(0.0f, 0.0f, 0.0f);
+    escala = glm::vec3(6.0f, 4.0f, 0.05f);
+    
     desplazamientoX = 0.0f; // Inicia completamente cerrada
 }
 
@@ -40,7 +40,7 @@ void Reja::Draw(Shader& shader, GLuint VAO) {
 
     // Nos posicionamos en el mundo y sumamos el deslizamiento
     model = glm::translate(model, posicion + glm::vec3(desplazamientoX, 0.0f, 0.0f));
-    model = glm::rotate(model, glm::radians(rotacion.y), glm::vec3(0.0f, 1.0f, 0.0f));
+   
     model = glm::scale(model, escala);
 
     GLuint modelLoc = glGetUniformLocation(shader.Program, "model");
@@ -52,13 +52,13 @@ void Reja::Draw(Shader& shader, GLuint VAO) {
     // Especularidad moderada (0.4) para que la luz rebote sin ser un espejo cromado
     if (specularLoc != -1) glUniform3f(specularLoc, 0.4f, 0.4f, 0.4f);
 
-    // Brillo bajo (16.0f en lugar de 64 o 128) para que el reflejo se disperse, simulando pintura porosa
+    // Brillo bajo para que el reflejo se disperse, simulando pintura porosa
     if (shininessLoc != -1) glUniform1f(shininessLoc, 16.0f);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texturaBarrotes);
 
     glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLES, 0, 12);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
 }

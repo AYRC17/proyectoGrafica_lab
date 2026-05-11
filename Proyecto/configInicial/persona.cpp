@@ -8,7 +8,7 @@ Persona::Persona(glm::vec3 posInicial) {
 
     // Inicialización de pose
     rotCuelloX = 0.0f; rotCuelloY = 0.0f;
-    rotHombroIzqX = 0.0f; rotHombroIzqZ = -5.0f; // Brazo en descanso
+    rotHombroIzqX = 0.0f; rotHombroIzqZ = -5.0f;// Brazo en descanso
     rotCodoIzq = 0.0f;
     rotHombroDerX = 0.0f; rotHombroDerZ = 5.0f; // Brazo en descanso
     rotCodoDer = 0.0f;
